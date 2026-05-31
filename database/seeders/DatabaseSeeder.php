@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\OrderStatus;
 use App\Models\Animal;
 use App\Models\Category;
 use App\Models\MenuItem;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -28,18 +32,18 @@ class DatabaseSeeder extends Seeder
         $snacks = Category::create(['name' => 'Snacks']);
 
         $menuItems = [
-            [$food->id, 'Kitsune Ramen', 'Rich tonkotsu broth with fox-shaped fishcake, soft-boiled egg, and green onion.', 2800],
-            [$food->id, 'Fox Den Toast', 'Thick milk bread topped with matcha cream and red bean paste, served warm.', 1800],
-            [$food->id, 'Tamago Sandwich', 'Fluffy Japanese egg salad on soft shokupan bread.', 1500],
-            [$drinks->id, 'Sakura Latte', 'Steamed milk with cherry blossom syrup and a dusting of pink powder.', 1200],
-            [$drinks->id, 'Matcha Fox', 'Ceremonial-grade matcha blended with oat milk, topped with fox latte art.', 1400],
-            [$drinks->id, 'Yuzu Lemonade', 'Fresh yuzu citrus with sparkling water and honey, served over ice.', 900],
-            [$drinks->id, 'Hojicha Milk Tea', 'Roasted green tea with brown sugar boba and creamy milk.', 1100],
-            [$desserts->id, 'Fox Waffle', 'Crispy waffle shaped like a fox face, served with maple syrup and whipped cream.', 1600],
-            [$desserts->id, 'Mochi Ice Cream', 'Three pieces of seasonal mochi ice cream — strawberry, matcha, and mango.', 1300],
-            [$desserts->id, 'Inari Cheesecake', 'Creamy no-bake cheesecake with a sesame cookie crust and tofu caramel.', 1500],
-            [$snacks->id, 'Edamame Bowl', 'Lightly salted edamame with a side of yuzu dipping sauce.', 700],
-            [$snacks->id, 'Fox Ears Chips', 'House-made taro chips shaped like fox ears, served with miso dip.', 800],
+            [$food->id,     'Kitsune Ramen',     'Rich tonkotsu broth with fox-shaped fishcake, soft-boiled egg, and green onion.',         35000],
+            [$food->id,     'Fox Den Toast',      'Thick milk bread topped with matcha cream and red bean paste, served warm.',               22000],
+            [$food->id,     'Tamago Sandwich',    'Fluffy Japanese egg salad on soft shokupan bread.',                                        18000],
+            [$drinks->id,   'Sakura Latte',       'Steamed milk with cherry blossom syrup and a dusting of pink powder.',                     28000],
+            [$drinks->id,   'Matcha Fox',         'Ceremonial-grade matcha blended with oat milk, topped with fox latte art.',                32000],
+            [$drinks->id,   'Yuzu Lemonade',      'Fresh yuzu citrus with sparkling water and honey, served over ice.',                       20000],
+            [$drinks->id,   'Hojicha Milk Tea',   'Roasted green tea with brown sugar boba and creamy milk.',                                 25000],
+            [$desserts->id, 'Fox Waffle',         'Crispy waffle shaped like a fox face, served with maple syrup and whipped cream.',         30000],
+            [$desserts->id, 'Mochi Ice Cream',    'Three pieces of seasonal mochi ice cream — strawberry, matcha, and mango.',                22000],
+            [$desserts->id, 'Inari Cheesecake',   'Creamy no-bake cheesecake with a sesame cookie crust and tofu caramel.',                   28000],
+            [$snacks->id,   'Edamame Bowl',       'Lightly salted edamame with a side of yuzu dipping sauce.',                                15000],
+            [$snacks->id,   'Fox Ears Chips',     'House-made taro chips shaped like fox ears, served with miso dip.',                        18000],
         ];
 
         foreach ($menuItems as [$categoryId, $name, $description, $priceCents]) {
@@ -68,6 +72,60 @@ class DatabaseSeeder extends Seeder
                 'description' => $description,
                 'is_active' => true,
             ]);
+        }
+
+        // Demo reviewers (separate from the test user so reviews look natural)
+        $reviewers = User::factory(6)->create();
+
+        $allItems = MenuItem::all();
+
+        // Give each reviewer a completed order so they can leave reviews
+        foreach ($reviewers as $reviewer) {
+            $sampledItems = $allItems->random(3);
+            $total = $sampledItems->sum('price_cents');
+
+            $order = Order::create([
+                'user_id' => $reviewer->id,
+                'status' => OrderStatus::Completed,
+                'total_cents' => $total,
+            ]);
+
+            foreach ($sampledItems as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'menu_item_id' => $item->id,
+                    'quantity' => 1,
+                    'price_cents' => $item->price_cents,
+                ]);
+            }
+        }
+
+        // Seed reviews — each reviewer reviews items they ordered
+        $comments = [
+            'Really enjoyed this, would order again!',
+            'Great flavour, perfect portion size.',
+            'Loved the presentation and the taste matched the description perfectly.',
+            'A bit on the sweet side for my taste but still very good.',
+            'One of the best things I have tried here.',
+            'The foxes came over while I was eating this — 10/10 experience.',
+            'Solid choice, nothing fancy but very satisfying.',
+            'My new favourite item on the menu.',
+            null,
+            null,
+        ];
+
+        foreach ($reviewers as $reviewer) {
+            $orderedItemIds = OrderItem::whereHas('order', fn ($q) => $q->where('user_id', $reviewer->id))
+                ->pluck('menu_item_id');
+
+            foreach ($orderedItemIds as $itemId) {
+                Review::create([
+                    'user_id' => $reviewer->id,
+                    'menu_item_id' => $itemId,
+                    'rating' => fake()->numberBetween(3, 5),
+                    'comment' => fake()->randomElement($comments),
+                ]);
+            }
         }
     }
 }
