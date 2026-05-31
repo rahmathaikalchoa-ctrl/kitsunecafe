@@ -1,0 +1,70 @@
+<?php
+
+use App\Models\Category;
+use App\Models\MenuItem;
+use App\Models\Order;
+use App\Models\User;
+use Livewire\Volt\Volt;
+
+test('guest is redirected to login when accessing checkout', function () {
+    $this->get(route('checkout.index'))->assertRedirect(route('login'));
+});
+
+test('authenticated user can view checkout', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->get(route('checkout.index'))->assertOk();
+});
+
+test('user can place an order', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $item = MenuItem::factory()->create(['category_id' => $category->id, 'price_cents' => 1500]);
+
+    $this->actingAs($user);
+    session(['cart' => [$item->id => 2]]);
+
+    Volt::test('pages.checkout.index')
+        ->call('placeOrder')
+        ->assertRedirect(route('dashboard'));
+
+    expect(Order::where('user_id', $user->id)->exists())->toBeTrue();
+});
+
+test('order is created with correct total', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $item = MenuItem::factory()->create(['category_id' => $category->id, 'price_cents' => 2000]);
+
+    $this->actingAs($user);
+    session(['cart' => [$item->id => 3]]);
+
+    Volt::test('pages.checkout.index')->call('placeOrder');
+
+    $order = Order::where('user_id', $user->id)->first();
+    expect($order->total_cents)->toBe(6000);
+    expect($order->orderItems)->toHaveCount(1);
+});
+
+test('cart is cleared after order is placed', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $item = MenuItem::factory()->create(['category_id' => $category->id]);
+
+    $this->actingAs($user);
+    session(['cart' => [$item->id => 1]]);
+
+    Volt::test('pages.checkout.index')->call('placeOrder');
+
+    expect(session('cart'))->toBeNull();
+});
+
+test('empty cart cannot be submitted', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    Volt::test('pages.checkout.index')
+        ->call('placeOrder')
+        ->assertHasErrors('cart');
+});
