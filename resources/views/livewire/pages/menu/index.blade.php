@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Enums\OrderStatus;
 use App\Models\Category;
 use App\Models\MenuItem;
@@ -100,6 +102,15 @@ new #[Layout('layouts.app')] class extends Component
         unset($this->selectedItem, $this->userReview, $this->userHasOrdered);
 
         $this->dispatch('open-menu-detail-modal');
+    }
+
+    public function closeItem(): void
+    {
+        $this->selectedItemId = null;
+        $this->editingReview = false;
+        $this->reviewRating = 5;
+        $this->reviewComment = '';
+        unset($this->selectedItem, $this->userReview, $this->userHasOrdered);
     }
 
     public function startEditReview(): void
@@ -256,24 +267,16 @@ new #[Layout('layouts.app')] class extends Component
                     @if ($this->selectedItem)
                         @php
                             $item = $this->selectedItem;
-                            $placeholderConfig = match(strtolower($item->category->name ?? '')) {
-                                'food'     => ['bg' => 'bg-amber-100',  'text' => 'text-amber-400',  'label' => 'FOOD'],
-                                'drinks'   => ['bg' => 'bg-sky-100',    'text' => 'text-sky-400',    'label' => 'DRINKS'],
-                                'desserts' => ['bg' => 'bg-pink-100',   'text' => 'text-pink-400',   'label' => 'DESSERTS'],
-                                'snacks'   => ['bg' => 'bg-orange-100', 'text' => 'text-orange-400', 'label' => 'SNACKS'],
-                                default    => ['bg' => 'bg-gray-100',   'text' => 'text-gray-400',   'label' => 'MENU'],
-                            };
                             $avg = round($item->reviews->avg('rating') ?? 0, 1);
                             $reviewCount = $item->reviews->count();
                         @endphp
 
                         {{-- Top section --}}
                         <div class="flex gap-5 pr-6">
-                            <div @class(['w-28 h-28 shrink-0 rounded-xl flex items-center justify-center', $placeholderConfig['bg']])>
-                                <span @class(['text-xs font-semibold tracking-widest uppercase', $placeholderConfig['text']])>
-                                    {{ $placeholderConfig['label'] }}
-                                </span>
-                            </div>
+                            <x-menu-category-placeholder
+                                :category="$item->category->name ?? ''"
+                                class="w-28 h-28 shrink-0 rounded-xl"
+                            />
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-start justify-between gap-2">
                                     <h2 class="text-xl font-bold text-gray-900">{{ $item->name }}</h2>
@@ -289,7 +292,14 @@ new #[Layout('layouts.app')] class extends Component
                                 @endif
                                 <div class="mt-4">
                                     @if ($item->is_available)
-                                        <flux:button wire:click="addToCart({{ $item->id }})" variant="primary" size="sm">
+                                        <flux:button
+                                            wire:click="addToCart({{ $item->id }})"
+                                            wire:loading.attr="disabled"
+                                            wire:loading.class="opacity-50"
+                                            wire:target="addToCart({{ $item->id }})"
+                                            variant="primary"
+                                            size="sm"
+                                        >
                                             Add to Cart
                                         </flux:button>
                                     @else
@@ -341,8 +351,16 @@ new #[Layout('layouts.app')] class extends Component
                                                 @auth
                                                     @if ($review->user_id === auth()->id())
                                                         <div class="flex gap-2">
-                                                            <button wire:click="startEditReview" class="text-xs text-gray-400 hover:text-amber-600 transition">Edit</button>
-                                                            <button wire:click="deleteReview" wire:confirm="Delete your review?" class="text-xs text-gray-400 hover:text-red-500 transition">Delete</button>
+                                                            <button wire:click="startEditReview"
+                                                                    wire:loading.attr="disabled"
+                                                                    wire:target="startEditReview"
+                                                                    class="text-xs text-gray-400 hover:text-amber-600 transition">Edit</button>
+                                                            <button wire:click="deleteReview"
+                                                                    wire:loading.attr="disabled"
+                                                                    wire:loading.class="opacity-50"
+                                                                    wire:target="deleteReview"
+                                                                    wire:confirm="Delete your review?"
+                                                                    class="text-xs text-gray-400 hover:text-red-500 transition">Delete</button>
                                                         </div>
                                                     @endif
                                                 @endauth
@@ -377,7 +395,7 @@ new #[Layout('layouts.app')] class extends Component
                                                 <div class="flex gap-1">
                                                     @for ($i = 1; $i <= 5; $i++)
                                                         <button type="button" wire:click="$set('reviewRating', {{ $i }})"
-                                                                class="focus:outline-none transition-transform hover:scale-110">
+                                                                class="focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1 rounded transition-transform hover:scale-110">
                                                             <svg viewBox="0 0 20 20" @class(['w-7 h-7 fill-current transition', $i <= $reviewRating ? 'text-amber-400' : 'text-gray-200'])>
                                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                             </svg>
@@ -385,6 +403,7 @@ new #[Layout('layouts.app')] class extends Component
                                                     @endfor
                                                     <span class="ml-2 text-sm text-gray-500 self-center">{{ $reviewRating }}/5</span>
                                                 </div>
+                                                <flux:error name="reviewRating" />
                                             </div>
 
                                             <flux:field>
@@ -394,7 +413,14 @@ new #[Layout('layouts.app')] class extends Component
                                             </flux:field>
 
                                             <div class="flex gap-2">
-                                                <flux:button type="submit" variant="primary" size="sm">
+                                                <flux:button
+                                                    type="submit"
+                                                    variant="primary"
+                                                    size="sm"
+                                                    wire:loading.attr="disabled"
+                                                    wire:loading.class="opacity-50"
+                                                    wire:target="submitReview"
+                                                >
                                                     {{ $editingReview ? 'Save Changes' : 'Submit Review' }}
                                                 </flux:button>
                                                 @if ($editingReview)

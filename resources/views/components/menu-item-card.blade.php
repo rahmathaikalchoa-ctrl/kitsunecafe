@@ -1,14 +1,6 @@
-@props(['item'])
+@props(['item' => \App\Models\MenuItem::class])
 
 @php
-    $placeholderConfig = match(strtolower($item->category->name ?? '')) {
-        'food'     => ['bg' => 'bg-amber-100',  'text' => 'text-amber-400',  'label' => 'FOOD'],
-        'drinks'   => ['bg' => 'bg-sky-100',    'text' => 'text-sky-400',    'label' => 'DRINKS'],
-        'desserts' => ['bg' => 'bg-pink-100',   'text' => 'text-pink-400',   'label' => 'DESSERTS'],
-        'snacks'   => ['bg' => 'bg-orange-100', 'text' => 'text-orange-400', 'label' => 'SNACKS'],
-        default    => ['bg' => 'bg-gray-100',   'text' => 'text-gray-400',   'label' => 'MENU'],
-    };
-
     $avg = round($item->reviews->avg('rating') ?? 0, 1);
     $reviewCount = $item->reviews->count();
 @endphp
@@ -19,11 +11,10 @@
 ])>
     {{-- Clickable top section → opens detail modal --}}
     <button wire:click="openItem({{ $item->id }})" class="w-full text-left focus:outline-none group">
-        <div @class(['h-40 flex items-center justify-center transition group-hover:brightness-95', $placeholderConfig['bg']])>
-            <span @class(['text-xs font-semibold tracking-widest uppercase', $placeholderConfig['text']])>
-                {{ $placeholderConfig['label'] }}
-            </span>
-        </div>
+        <x-menu-category-placeholder
+            :category="$item->category->name ?? ''"
+            class="h-40 transition group-hover:brightness-95"
+        />
 
         <div class="p-4 pb-2">
             <div class="flex items-start justify-between gap-2">
@@ -63,6 +54,9 @@
         @if ($item->is_available)
             <flux:button
                 wire:click="addToCart({{ $item->id }})"
+                wire:loading.attr="disabled"
+                wire:loading.class="opacity-50"
+                wire:target="addToCart({{ $item->id }})"
                 variant="primary"
                 size="sm"
                 class="w-full"
