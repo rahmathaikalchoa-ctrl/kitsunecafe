@@ -6,19 +6,23 @@
 @endphp
 
 <div @class([
-    'flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition hover:shadow-md',
+    'group flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200',
     'opacity-60' => ! $item->is_available,
 ])>
     {{-- Clickable top section → opens detail modal --}}
-    <button wire:click="openItem({{ $item->id }})" class="w-full text-left focus:outline-none group">
-        <x-menu-category-placeholder
-            :category="$item->category->name ?? ''"
-            class="h-40 transition group-hover:brightness-95"
-        />
+    <button wire:click="openItem({{ $item->id }})" class="w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-inset">
+
+        {{-- Image area — inner overflow-hidden clips the zoom effect --}}
+        <div class="overflow-hidden">
+            <x-menu-category-placeholder
+                :category="$item->category->name ?? ''"
+                class="h-40 transition-transform duration-500 group-hover:scale-110"
+            />
+        </div>
 
         <div class="p-4 pb-2">
             <div class="flex items-start justify-between gap-2">
-                <h3 class="font-semibold text-gray-900 leading-snug group-hover:text-amber-700 transition">
+                <h3 class="font-semibold text-gray-900 leading-snug group-hover:text-amber-700 transition-colors duration-200">
                     {{ $item->name }}
                 </h3>
                 <div class="flex flex-col items-end gap-0.5 shrink-0">
@@ -49,24 +53,39 @@
         </div>
     </button>
 
-    {{-- Add to Cart — separate from clickable area --}}
+    {{-- Add to Cart — separate from the clickable area above --}}
     <div class="px-4 pb-4 pt-2 mt-auto">
         @if ($item->is_available)
-            <flux:button
+            <button
                 wire:click="addToCart({{ $item->id }})"
                 wire:loading.attr="disabled"
-                wire:loading.class="opacity-50"
+                wire:loading.class="opacity-60 cursor-wait"
                 wire:target="addToCart({{ $item->id }})"
-                variant="primary"
-                size="sm"
-                class="w-full"
+                type="button"
+                class="w-full bg-gradient-to-r from-amber-500 to-orange-400
+                       hover:from-amber-600 hover:to-orange-500
+                       hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
+                       active:translate-y-0 active:shadow-sm active:scale-[0.97]
+                       text-white text-sm font-semibold py-2 px-4 rounded-lg
+                       transition-all duration-200
+                       focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
+                       disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:active:scale-100"
             >
-                Add to Cart
-            </flux:button>
+                <span wire:loading.remove wire:target="addToCart({{ $item->id }})">Add to Cart</span>
+                <span wire:loading wire:target="addToCart({{ $item->id }})" class="flex items-center justify-center gap-1.5">
+                    <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 22 6.477 22 12h-4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                    </svg>
+                    Adding...
+                </span>
+            </button>
         @else
-            <flux:button disabled size="sm" class="w-full">
+            <button disabled type="button"
+                class="w-full bg-gray-100 text-gray-400 text-sm font-semibold py-2 px-4 rounded-lg
+                       cursor-not-allowed opacity-60">
                 Not Available
-            </flux:button>
+            </button>
         @endif
     </div>
 </div>
