@@ -32,27 +32,28 @@ class DatabaseSeeder extends Seeder
         $snacks = Category::create(['name' => 'Snacks']);
 
         $menuItems = [
-            [$food->id,     'Kitsune Ramen',     'Rich tonkotsu broth with fox-shaped fishcake, soft-boiled egg, and green onion.',         35000],
-            [$food->id,     'Fox Den Toast',      'Thick milk bread topped with matcha cream and red bean paste, served warm.',               22000],
-            [$food->id,     'Tamago Sandwich',    'Fluffy Japanese egg salad on soft shokupan bread.',                                        18000],
-            [$drinks->id,   'Sakura Latte',       'Steamed milk with cherry blossom syrup and a dusting of pink powder.',                     28000],
-            [$drinks->id,   'Matcha Fox',         'Ceremonial-grade matcha blended with oat milk, topped with fox latte art.',                32000],
-            [$drinks->id,   'Yuzu Lemonade',      'Fresh yuzu citrus with sparkling water and honey, served over ice.',                       20000],
-            [$drinks->id,   'Hojicha Milk Tea',   'Roasted green tea with brown sugar boba and creamy milk.',                                 25000],
-            [$desserts->id, 'Fox Waffle',         'Crispy waffle shaped like a fox face, served with maple syrup and whipped cream.',         30000],
-            [$desserts->id, 'Mochi Ice Cream',    'Three pieces of seasonal mochi ice cream — strawberry, matcha, and mango.',                22000],
-            [$desserts->id, 'Inari Cheesecake',   'Creamy no-bake cheesecake with a sesame cookie crust and tofu caramel.',                   28000],
-            [$snacks->id,   'Edamame Bowl',       'Lightly salted edamame with a side of yuzu dipping sauce.',                                15000],
-            [$snacks->id,   'Fox Ears Chips',     'House-made taro chips shaped like fox ears, served with miso dip.',                        18000],
+            [$food->id,     'Kitsune Ramen',     'Rich tonkotsu broth with fox-shaped fishcake, soft-boiled egg, and green onion.',         35000, 'kitsune_ramen.jpg'],
+            [$food->id,     'Fox Den Toast',      'Thick milk bread topped with matcha cream and red bean paste, served warm.',               22000, 'fox_den_toast.jpg'],
+            [$food->id,     'Tamago Sandwich',    'Fluffy Japanese egg salad on soft shokupan bread.',                                        18000, 'tamago_sandwich.jpg'],
+            [$drinks->id,   'Sakura Latte',       'Steamed milk with cherry blossom syrup and a dusting of pink powder.',                     28000, 'sakura_latte.jpg'],
+            [$drinks->id,   'Matcha Fox',         'Ceremonial-grade matcha blended with oat milk, topped with fox latte art.',                32000, 'matcha_fox.jpg'],
+            [$drinks->id,   'Yuzu Lemonade',      'Fresh yuzu citrus with sparkling water and honey, served over ice.',                       20000, 'yuzu_lemonade.jpg'],
+            [$drinks->id,   'Hojicha Milk Tea',   'Roasted green tea with brown sugar boba and creamy milk.',                                 25000, 'hojicha_milk_tea.jpg'],
+            [$desserts->id, 'Fox Waffle',         'Crispy waffle shaped like a fox face, served with maple syrup and whipped cream.',         30000, 'fox_waffle.jpg'],
+            [$desserts->id, 'Mochi Ice Cream',    'Three pieces of seasonal mochi ice cream — strawberry, matcha, and mango.',                22000, 'mochi_ice_cream.jpg'],
+            [$desserts->id, 'Inari Cheesecake',   'Creamy no-bake cheesecake with a sesame cookie crust and tofu caramel.',                   28000, 'inari_cheesecake.jpg'],
+            [$snacks->id,   'Edamame Bowl',       'Lightly salted edamame with a side of yuzu dipping sauce.',                                15000, 'edamame_bowl.jpg'],
+            [$snacks->id,   'Fox Ears Chips',     'House-made taro chips shaped like fox ears, served with miso dip.',                        18000, 'fox_ears_chips.jpg'],
         ];
 
-        foreach ($menuItems as [$categoryId, $name, $description, $priceCents]) {
+        foreach ($menuItems as [$categoryId, $name, $description, $priceCents, $imagePath]) {
             MenuItem::create([
                 'category_id' => $categoryId,
                 'name' => $name,
                 'description' => $description,
                 'price_cents' => $priceCents,
                 'is_available' => true,
+                'image_path' => $imagePath,
             ]);
         }
 

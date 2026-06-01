@@ -14,10 +14,19 @@
 
         {{-- Image area — inner overflow-hidden clips the zoom effect --}}
         <div class="overflow-hidden">
-            <x-menu-category-placeholder
-                :category="$item->category->name ?? ''"
-                class="h-40 transition-transform duration-500 group-hover:scale-110"
-            />
+            @if ($item->image_path)
+                <img
+                    src="{{ asset('images/menu/' . $item->image_path) }}"
+                    alt="{{ $item->name }}"
+                    class="w-full h-40 object-cover transition-transform duration-500 group-hover:scale-110"
+                    loading="lazy"
+                />
+            @else
+                <x-menu-category-placeholder
+                    :category="$item->category->name ?? ''"
+                    class="h-40 transition-transform duration-500 group-hover:scale-110"
+                />
+            @endif
         </div>
 
         <div class="p-4 pb-2">

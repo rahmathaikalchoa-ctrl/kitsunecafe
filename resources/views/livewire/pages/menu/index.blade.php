@@ -274,10 +274,18 @@ new #[Layout('layouts.app')] class extends Component
 
                         {{-- Top section --}}
                         <div class="flex gap-5 pr-6">
-                            <x-menu-category-placeholder
-                                :category="$item->category->name ?? ''"
-                                class="w-28 h-28 shrink-0 rounded-xl"
-                            />
+                            @if ($item->image_path)
+                                <img
+                                    src="{{ asset('images/menu/' . $item->image_path) }}"
+                                    alt="{{ $item->name }}"
+                                    class="w-28 h-28 shrink-0 rounded-xl object-cover"
+                                />
+                            @else
+                                <x-menu-category-placeholder
+                                    :category="$item->category->name ?? ''"
+                                    class="w-28 h-28 shrink-0 rounded-xl"
+                                />
+                            @endif
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-start justify-between gap-2">
                                     <h2 class="text-xl font-bold text-gray-900">{{ $item->name }}</h2>
