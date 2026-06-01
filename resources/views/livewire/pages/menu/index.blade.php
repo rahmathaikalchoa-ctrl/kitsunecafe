@@ -175,6 +175,7 @@ new #[Layout('layouts.app')] class extends Component
 
 <div class="py-10"
      x-data="{ modalOpen: false }"
+     x-effect="document.body.style.overflow = modalOpen ? 'hidden' : ''"
      x-on:open-menu-detail-modal.window="modalOpen = true"
      x-on:keydown.escape.window="modalOpen = false; $wire.closeItem()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
