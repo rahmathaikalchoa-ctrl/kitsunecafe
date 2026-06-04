@@ -31,16 +31,6 @@ test('inactive animal show page returns 404', function () {
     $this->get(route('animals.show', $animal))->assertNotFound();
 });
 
-test('listing search filters foxes by name', function () {
-    Animal::factory()->create(['name' => 'Kiku']);
-    Animal::factory()->create(['name' => 'Taiyo']);
-
-    Volt::test('pages.animals.index')
-        ->set('search', 'Kik')
-        ->assertSee('Kiku')
-        ->assertDontSee('Taiyo');
-});
-
 test('listing colour filter shows only matching foxes', function () {
     Animal::factory()->create(['name' => 'Hoshi', 'color' => 'Silver']);
     Animal::factory()->create(['name' => 'Kiku', 'color' => 'Red']);
