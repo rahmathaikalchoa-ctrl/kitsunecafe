@@ -4,6 +4,12 @@
     $imageSrc = $animal->image_path
         ? (str_starts_with($animal->image_path, 'http') ? $animal->image_path : asset('images/animals/' . $animal->image_path))
         : null;
+
+    $meta = array_filter([
+        $animal->gender,
+        $animal->age ? $animal->age . ' ' . Str::plural('yr', $animal->age) : null,
+        $animal->color,
+    ]);
 @endphp
 
 <button type="button" wire:click="openFox({{ $animal->id }})"
@@ -33,6 +39,9 @@
                 {{ $animal->species->value }}
             </span>
         </div>
+        @if (count($meta))
+            <p class="text-xs text-gray-400 mb-1.5">{{ implode(' · ', $meta) }}</p>
+        @endif
         <p class="text-sm text-gray-500 line-clamp-3">{{ $animal->description }}</p>
         <p class="mt-3 text-sm font-medium text-orange-600 flex items-center gap-1 group-hover:gap-2 transition-all">
             View profile

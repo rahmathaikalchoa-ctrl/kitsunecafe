@@ -11,10 +11,34 @@ new #[Layout('layouts.app')] class extends Component
 {
     public ?int $selectedAnimalId = null;
 
+    public string $search = '';
+
+    public ?string $color = null;
+
     #[Computed]
     public function animals()
     {
-        return Animal::active()->orderBy('name')->get();
+        return Animal::active()
+            ->when($this->search, fn ($q) => $q->where('name', 'like', '%'.$this->search.'%'))
+            ->when($this->color, fn ($q) => $q->where('color', $this->color))
+            ->orderBy('name')
+            ->get();
+    }
+
+    #[Computed]
+    public function colors()
+    {
+        return Animal::active()
+            ->whereNotNull('color')
+            ->distinct()
+            ->orderBy('color')
+            ->pluck('color');
+    }
+
+    #[Computed]
+    public function totalFoxes(): int
+    {
+        return Animal::active()->count();
     }
 
     #[Computed]
@@ -52,16 +76,64 @@ new #[Layout('layouts.app')] class extends Component
      x-on:open-fox-modal.window="modalOpen = true"
      x-on:keydown.escape.window="modalOpen = false; $wire.closeFox()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p class="text-gray-600 mb-8 max-w-2xl">
+        <p class="text-gray-600 mb-2 max-w-2xl">
             Every fox at Kitsune Animal Cafe has their own story. Get to know them before your visit
             — or better yet, let them find you when you arrive.
         </p>
+        <p class="text-sm font-medium text-orange-600 mb-8">{{ $this->totalFoxes }} resident {{ Str::plural('fox', $this->totalFoxes) }}</p>
+
+        {{-- Search + colour filter --}}
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+            <div class="relative sm:w-64">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+                </svg>
+                <input type="search"
+                       wire:model.live.debounce.300ms="search"
+                       placeholder="Search foxes by name…"
+                       aria-label="Search foxes by name"
+                       class="w-full pl-9 pr-3 py-1.5 rounded-full border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition" />
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+                <button
+                    wire:click="$set('color', null)"
+                    wire:loading.class="opacity-50 cursor-wait"
+                    wire:target="$set('color', null)"
+                    @class([
+                        'px-4 py-1.5 rounded-full text-sm font-medium transition',
+                        'bg-orange-500 text-white' => $color === null,
+                        'bg-white text-gray-600 border border-gray-200 hover:border-orange-300' => $color !== null,
+                    ])>
+                    All
+                </button>
+                @foreach ($this->colors as $c)
+                    <button
+                        wire:click="$set('color', '{{ $c }}')"
+                        wire:loading.class="opacity-50 cursor-wait"
+                        wire:target="$set('color', '{{ $c }}')"
+                        @class([
+                            'px-4 py-1.5 rounded-full text-sm font-medium transition',
+                            'bg-orange-500 text-white' => $color === $c,
+                            'bg-white text-gray-600 border border-gray-200 hover:border-orange-300' => $color !== $c,
+                        ])>
+                        {{ $c }}
+                    </button>
+                @endforeach
+            </div>
+        </div>
 
         @if ($this->animals->isEmpty())
             <div class="text-center py-20 text-gray-400">
-                <p class="text-lg">No foxes to show right now. Check back soon!</p>
+                @if ($search !== '' || $color !== null)
+                    <p class="text-lg">No foxes match your search.</p>
+                    <button wire:click="$set('search', ''); $set('color', null)" class="mt-3 text-sm font-medium text-orange-600 hover:underline">Clear filters</button>
+                @else
+                    <p class="text-lg">No foxes to show right now. Check back soon!</p>
+                @endif
             </div>
         @else
+            <p class="text-sm text-gray-400 mb-4">Showing {{ $this->animals->count() }} of {{ $this->totalFoxes }} {{ Str::plural('fox', $this->totalFoxes) }}</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($this->animals as $animal)
                     <x-animal-card :animal="$animal" wire:key="animal-{{ $animal->id }}" />
