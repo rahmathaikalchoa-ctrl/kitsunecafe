@@ -82,7 +82,7 @@ new #[Layout('layouts.app')] class extends Component
     public function addToCart(int $menuItemId, CartService $cart): void
     {
         if (! auth()->check()) {
-            $this->redirect(route('login'), navigate: true);
+            $this->dispatch('login-required');
 
             return;
         }
@@ -184,6 +184,8 @@ new #[Layout('layouts.app')] class extends Component
         <div class="flex flex-wrap gap-2 mb-8">
             <button
                 wire:click="$set('categoryId', null)"
+                wire:loading.class="opacity-50 cursor-wait"
+                wire:target="$set('categoryId', null)"
                 @class([
                     'px-4 py-1.5 rounded-full text-sm font-medium transition',
                     'bg-amber-500 text-white' => $categoryId === null,
@@ -194,6 +196,8 @@ new #[Layout('layouts.app')] class extends Component
             @foreach ($this->categories as $category)
                 <button
                     wire:click="$set('categoryId', {{ $category->id }})"
+                    wire:loading.class="opacity-50 cursor-wait"
+                    wire:target="$set('categoryId', {{ $category->id }})"
                     @class([
                         'px-4 py-1.5 rounded-full text-sm font-medium transition',
                         'bg-amber-500 text-white' => $categoryId === $category->id,
@@ -212,7 +216,7 @@ new #[Layout('layouts.app')] class extends Component
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 @foreach ($this->menuItems as $item)
-                    <x-menu-item-card :item="$item" />
+                    <x-menu-item-card :item="$item" wire:key="menu-item-{{ $item->id }}" />
                 @endforeach
             </div>
         @endif
@@ -220,15 +224,33 @@ new #[Layout('layouts.app')] class extends Component
         {{-- Cart toast --}}
         <div
             x-data="{ show: false }"
-            x-on:cart-updated.window="show = true; setTimeout(() => show = false, 2000)"
+            x-on:cart-updated.window="show = true; setTimeout(() => show = false, 3000)"
             x-show="show"
             x-transition
             class="fixed bottom-6 right-6 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg z-50 flex items-center gap-2"
+            role="status"
+            aria-live="polite"
         >
-            <svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
             </svg>
             Added to cart
+        </div>
+
+        {{-- Login-required toast (guest adds to cart) --}}
+        <div
+            x-data="{ show: false }"
+            x-on:login-required.window="show = true; setTimeout(() => { window.location = '{{ route('login') }}'; }, 1800)"
+            x-show="show"
+            x-transition
+            class="fixed bottom-6 right-6 bg-amber-600 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg z-50 flex items-center gap-2"
+            role="status"
+            aria-live="polite"
+        >
+            <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"/>
+            </svg>
+            Log in to add items to your cart
         </div>
 
         {{-- ── Backdrop ──────────────────────────────────────────────────────── --}}
@@ -260,9 +282,10 @@ new #[Layout('layouts.app')] class extends Component
 
                 {{-- Close button --}}
                 <button type="button"
+                        aria-label="Close"
                         x-on:click="modalOpen = false; $wire.closeItem()"
                         class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition z-10">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
@@ -278,8 +301,9 @@ new #[Layout('layouts.app')] class extends Component
                         {{-- Top section --}}
                         <div class="flex gap-5 pr-6">
                             @if ($item->image_path)
+                                @php $imageSrc = str_starts_with($item->image_path, 'http') ? $item->image_path : asset('images/menu/' . $item->image_path); @endphp
                                 <img
-                                    src="{{ asset('images/menu/' . $item->image_path) }}"
+                                    src="{{ $imageSrc }}"
                                     alt="{{ $item->name }}"
                                     class="w-28 h-28 shrink-0 rounded-xl object-cover"
                                 />
@@ -424,8 +448,9 @@ new #[Layout('layouts.app')] class extends Component
                                                 <div class="flex gap-1">
                                                     @for ($i = 1; $i <= 5; $i++)
                                                         <button type="button" wire:click="$set('reviewRating', {{ $i }})"
+                                                                aria-label="Rate {{ $i }} {{ $i === 1 ? 'star' : 'stars' }}"
                                                                 class="focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1 rounded transition-transform hover:scale-110">
-                                                            <svg viewBox="0 0 20 20" @class(['w-7 h-7 fill-current transition', $i <= $reviewRating ? 'text-amber-400' : 'text-gray-200'])>
+                                                            <svg viewBox="0 0 20 20" aria-hidden="true" @class(['w-7 h-7 fill-current transition', $i <= $reviewRating ? 'text-amber-400' : 'text-gray-200'])>
                                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                             </svg>
                                                         </button>

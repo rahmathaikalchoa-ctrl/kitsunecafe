@@ -36,13 +36,13 @@ test('category filter shows only items in that category', function () {
         ->assertDontSee('Matcha Latte');
 });
 
-test('guest is redirected to login when adding to cart', function () {
+test('guest sees login-required event when adding to cart', function () {
     $category = Category::factory()->create();
     $item = MenuItem::factory()->create(['category_id' => $category->id]);
 
     Volt::test('pages.menu.index')
         ->call('addToCart', $item->id)
-        ->assertRedirect(route('login'));
+        ->assertDispatched('login-required');
 });
 
 test('authenticated user can add item to cart', function () {

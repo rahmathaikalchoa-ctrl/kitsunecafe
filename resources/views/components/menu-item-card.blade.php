@@ -3,23 +3,38 @@
 @php
     $avg = round($item->reviews->avg('rating') ?? 0, 1);
     $reviewCount = $item->reviews->count();
+    $imageSrc = $item->image_path
+        ? (str_starts_with($item->image_path, 'http') ? $item->image_path : asset('images/menu/' . $item->image_path))
+        : null;
 @endphp
 
 <div @class([
     'group flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200',
     'opacity-60' => ! $item->is_available,
 ])>
-    {{-- Clickable top section → opens detail modal --}}
-    <button wire:click="openItem({{ $item->id }})" class="w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-inset">
-
+    {{-- Clickable top section → opens detail modal (disabled when item unavailable) --}}
+    <button
+        @if ($item->is_available) wire:click="openItem({{ $item->id }})" @endif
+        type="button"
+        @class([
+            'w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-inset',
+            'cursor-not-allowed pointer-events-none' => ! $item->is_available,
+        ])
+    >
         {{-- Image area — inner overflow-hidden clips the zoom effect --}}
         <div class="overflow-hidden">
-            @if ($item->image_path)
+            @if ($imageSrc)
                 <img
-                    src="{{ asset('images/menu/' . $item->image_path) }}"
+                    src="{{ $imageSrc }}"
                     alt="{{ $item->name }}"
                     class="w-full h-40 object-cover transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                />
+                <x-menu-category-placeholder
+                    :category="$item->category->name ?? ''"
+                    class="h-40 transition-transform duration-500 group-hover:scale-110"
+                    style="display:none"
                 />
             @else
                 <x-menu-category-placeholder
@@ -48,10 +63,10 @@
 
             {{-- Rating row --}}
             @if ($reviewCount > 0)
-                <div class="flex items-center gap-1.5 mt-2">
-                    <div class="flex">
+                <div class="flex items-center gap-1.5 mt-2" aria-label="Rated {{ $avg }} out of 5">
+                    <div class="flex" aria-hidden="true">
                         @for ($i = 1; $i <= 5; $i++)
-                            <svg viewBox="0 0 20 20" @class(['w-3.5 h-3.5 fill-current', $i <= $avg ? 'text-amber-400' : 'text-gray-200'])>
+                            <svg viewBox="0 0 20 20" aria-hidden="true" @class(['w-3.5 h-3.5 fill-current', $i <= $avg ? 'text-amber-400' : 'text-gray-200'])>
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
                         @endfor
@@ -82,7 +97,7 @@
             >
                 <span wire:loading.remove wire:target="addToCart({{ $item->id }})">Add to Cart</span>
                 <span wire:loading wire:target="addToCart({{ $item->id }})" class="flex items-center justify-center gap-1.5">
-                    <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                    <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 22 6.477 22 12h-4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                     </svg>

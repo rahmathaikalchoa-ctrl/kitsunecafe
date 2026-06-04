@@ -38,11 +38,6 @@ class MenuItem extends Model
         return $this->hasMany(Review::class);
     }
 
-    public function averageRating(): float
-    {
-        return round((float) ($this->reviews()->avg('rating') ?? 0.0), 1);
-    }
-
     public function scopeAvailable(Builder $query): Builder
     {
         return $query->where('is_available', true);

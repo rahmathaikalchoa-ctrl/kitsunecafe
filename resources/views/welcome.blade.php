@@ -4,6 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kitsune Animal Cafe</title>
+    <meta name="description" content="Visit Kitsune Animal Cafe — handcrafted food, specialty drinks, and six resident foxes. Order online and get to know each fox before you visit.">
+    <meta property="og:title" content="Kitsune Animal Cafe">
+    <meta property="og:description" content="Handcrafted food, specialty drinks, and six resident foxes. A little magic in every visit.">
+    <meta property="og:type" content="website">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -46,7 +50,7 @@
         </div>
 
         {{-- Decorative fox silhouette watermark --}}
-        <div class="absolute -bottom-12 left-1/2 -translate-x-1/2 select-none pointer-events-none opacity-[0.07]">
+        <div class="absolute -bottom-12 left-1/2 -translate-x-1/2 select-none pointer-events-none opacity-[0.07]" aria-hidden="true">
             <svg class="w-80 h-80 text-amber-700" viewBox="0 0 200 200" fill="currentColor">
                 {{-- Fox ears --}}
                 <polygon points="35,170 8,35 85,105"/>
