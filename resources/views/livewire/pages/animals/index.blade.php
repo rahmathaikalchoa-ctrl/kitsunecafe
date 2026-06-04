@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\Animal;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
