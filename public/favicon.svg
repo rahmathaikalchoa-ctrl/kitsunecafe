@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+    <!-- Left ear -->
+    <path fill="#f59e0b" d="M8 7 L25 23 L15 30 Z"/>
+    <!-- Right ear -->
+    <path fill="#f59e0b" d="M56 7 L39 23 L49 30 Z"/>
+    <!-- Fox face -->
+    <path fill="#f59e0b" d="M13 22 C20 17 44 17 51 22 C53 31 47 41 39 49 L32 55 L25 49 C17 41 11 31 13 22 Z"/>
+    <!-- Eyes -->
+    <circle cx="25" cy="33" r="2.6" fill="#fff"/>
+    <circle cx="39" cy="33" r="2.6" fill="#fff"/>
+    <!-- Snout tip -->
+    <circle cx="32" cy="46" r="2.4" fill="#fff"/>
+</svg>

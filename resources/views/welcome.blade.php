@@ -8,6 +8,7 @@
     <meta property="og:title" content="Kitsune Animal Cafe">
     <meta property="og:description" content="Handcrafted food, specialty drinks, and six resident foxes. A little magic in every visit.">
     <meta property="og:type" content="website">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
