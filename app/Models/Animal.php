@@ -16,13 +16,25 @@ class Animal extends Model
     protected $fillable = [
         'name',
         'species',
+        'gender',
+        'age',
+        'color',
+        'arrived_year',
         'description',
+        'personality',
+        'favourite_treat',
+        'favourite_spot',
+        'fun_facts',
         'image_path',
         'is_active',
     ];
 
     protected $casts = [
         'species' => AnimalSpecies::class,
+        'age' => 'integer',
+        'arrived_year' => 'integer',
+        'personality' => 'array',
+        'fun_facts' => 'array',
         'is_active' => 'boolean',
     ];
 

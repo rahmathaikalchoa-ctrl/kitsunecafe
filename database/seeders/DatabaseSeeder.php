@@ -66,23 +66,84 @@ class DatabaseSeeder extends Seeder
         }
 
         $foxes = [
-            ['Kiku', 'Kiku is a gentle red fox who loves napping near the window in the afternoon sun. She was rescued as a kit and has lived at the cafe since it opened. Her favourite treat is a piece of our Fox Ears Chips.', 'kiku.jpg'],
-            ['Taiyo', 'Taiyo is the most energetic fox at the cafe. He greets every guest at the door with a curious sniff and a wagging tail. He is easily recognized by the white tip on his tail and his bright amber eyes.', 'taiyo.jpg'],
-            ['Hoshi', 'Hoshi is a silver fox with a calm, regal temperament. She is often found sitting on the highest shelf in the reading corner, surveying the cafe with quiet dignity. Guests say she looks like she is running the place.', 'hoshi.jpg'],
-            ['Mochi', 'Mochi is a small, fluffy arctic fox whose coat changes from pure white in winter to sandy brown in summer. He is shy at first but warms up quickly over a bowl of edamame.', 'mochi.jpg'],
-            ['Sora', 'Sora arrived at the cafe last spring and is still learning the ropes. She is playful and curious, often stealing guests\' napkins as a game. Staff say she is the troublemaker of the group, in the best possible way.', 'sora.jpg'],
-            ['Ren', 'Ren is the eldest fox at Kitsune Animal Cafe and is considered the guardian of the space. He moves slowly and deliberately, and a visit from Ren — who chooses his guests carefully — is said to bring good luck.', 'ren.jpg'],
-            ['Yuki', 'Yuki is a snow-white fox with the softest coat at the cafe. She is calm and a little aloof, preferring quiet corners and the cool tile by the entrance. Regulars say catching Yuki in a playful mood is a rare treat.', 'yuki.jpg'],
-            ['Haru', 'Haru is a warm-hearted fox who seems to glow in the morning light. He loves greeting the first guests of the day and dozing in sunbeams. His gentle eyes have made him a favourite among returning visitors.', 'haru.jpg'],
-            ['Kaze', 'Kaze is the fastest fox at the cafe, always darting between tables in a flash of orange. Energetic and mischievous, he turns every visit into a little adventure — keep an eye on your snacks when Kaze is around.', 'kaze.jpg'],
+            [
+                'name' => 'Kiku', 'gender' => 'Female', 'age' => 4, 'color' => 'Red', 'arrived_year' => 2021,
+                'description' => 'Kiku is a gentle red fox who loves napping near the window in the afternoon sun. She was rescued as a kit and has lived at the cafe since it opened. Her favourite treat is a piece of our Fox Ears Chips.',
+                'personality' => ['Gentle', 'Sleepy', 'Affectionate'],
+                'favourite_treat' => 'Fox Ears Chips', 'favourite_spot' => 'The sunny window seat',
+                'fun_facts' => ['Was rescued as a tiny kit', 'Can sleep up to 14 hours a day', 'Chirps softly when she is happy'],
+                'image_path' => 'kiku.jpg',
+            ],
+            [
+                'name' => 'Taiyo', 'gender' => 'Male', 'age' => 3, 'color' => 'Red', 'arrived_year' => 2022,
+                'description' => 'Taiyo is the most energetic fox at the cafe. He greets every guest at the door with a curious sniff and a wagging tail. He is easily recognized by the white tip on his tail and his bright amber eyes.',
+                'personality' => ['Energetic', 'Friendly', 'Curious'],
+                'favourite_treat' => 'Tamago Sandwich', 'favourite_spot' => 'By the front door',
+                'fun_facts' => ['Greets nearly every guest at the door', 'Recognized by his white tail tip', 'Can leap over a metre high'],
+                'image_path' => 'taiyo.jpg',
+            ],
+            [
+                'name' => 'Hoshi', 'gender' => 'Female', 'age' => 5, 'color' => 'Silver', 'arrived_year' => 2020,
+                'description' => 'Hoshi is a silver fox with a calm, regal temperament. She is often found sitting on the highest shelf in the reading corner, surveying the cafe with quiet dignity. Guests say she looks like she is running the place.',
+                'personality' => ['Calm', 'Regal', 'Observant'],
+                'favourite_treat' => 'Inari Cheesecake', 'favourite_spot' => 'The top reading-corner shelf',
+                'fun_facts' => ['Prefers the highest perch in the room', 'Rarely makes a sound', 'Looks like she runs the place'],
+                'image_path' => 'hoshi.jpg',
+            ],
+            [
+                'name' => 'Mochi', 'gender' => 'Male', 'age' => 2, 'color' => 'Arctic', 'arrived_year' => 2023,
+                'description' => 'Mochi is a small, fluffy arctic fox whose coat changes from pure white in winter to sandy brown in summer. He is shy at first but warms up quickly over a bowl of edamame.',
+                'personality' => ['Shy', 'Fluffy', 'Sweet'],
+                'favourite_treat' => 'Edamame Bowl', 'favourite_spot' => 'The cool tiles near the kitchen',
+                'fun_facts' => ['His coat turns pure white in winter', 'Shy at first but quick to warm up', 'The smallest fox at the cafe'],
+                'image_path' => 'mochi.jpg',
+            ],
+            [
+                'name' => 'Sora', 'gender' => 'Female', 'age' => 1, 'color' => 'Red', 'arrived_year' => 2024,
+                'description' => 'Sora arrived at the cafe last spring and is still learning the ropes. She is playful and curious, often stealing guests\' napkins as a game. Staff say she is the troublemaker of the group, in the best possible way.',
+                'personality' => ['Playful', 'Mischievous', 'Curious'],
+                'favourite_treat' => 'Fox Waffle', 'favourite_spot' => 'Under the corner tables',
+                'fun_facts' => ['Loves stealing napkins as a game', 'The newest member of the group', 'Has seemingly endless curiosity'],
+                'image_path' => 'sora.jpg',
+            ],
+            [
+                'name' => 'Ren', 'gender' => 'Male', 'age' => 8, 'color' => 'Red', 'arrived_year' => 2019,
+                'description' => 'Ren is the eldest fox at Kitsune Animal Cafe and is considered the guardian of the space. He moves slowly and deliberately, and a visit from Ren — who chooses his guests carefully — is said to bring good luck.',
+                'personality' => ['Wise', 'Calm', 'Dignified'],
+                'favourite_treat' => 'Kitsune Curry Rice', 'favourite_spot' => 'The warm hearth by the entrance',
+                'fun_facts' => ['The eldest fox at the cafe', 'A visit from Ren is said to bring good luck', 'Chooses his guests carefully'],
+                'image_path' => 'ren.jpg',
+            ],
+            [
+                'name' => 'Yuki', 'gender' => 'Female', 'age' => 3, 'color' => 'Arctic', 'arrived_year' => 2022,
+                'description' => 'Yuki is a snow-white fox with the softest coat at the cafe. She is calm and a little aloof, preferring quiet corners and the cool tile by the entrance. Regulars say catching Yuki in a playful mood is a rare treat.',
+                'personality' => ['Calm', 'Aloof', 'Elegant'],
+                'favourite_treat' => 'Mochi Ice Cream', 'favourite_spot' => 'The cool tile by the entrance',
+                'fun_facts' => ['Has the softest coat at the cafe', 'Enjoys quiet corners', 'A playful mood from Yuki is a rare treat'],
+                'image_path' => 'yuki.jpg',
+            ],
+            [
+                'name' => 'Haru', 'gender' => 'Male', 'age' => 2, 'color' => 'Red', 'arrived_year' => 2023,
+                'description' => 'Haru is a warm-hearted fox who seems to glow in the morning light. He loves greeting the first guests of the day and dozing in sunbeams. His gentle eyes have made him a favourite among returning visitors.',
+                'personality' => ['Warm', 'Gentle', 'Sociable'],
+                'favourite_treat' => 'Fox Den Toast', 'favourite_spot' => 'The morning sunbeam by the east window',
+                'fun_facts' => ['Loves greeting the first guests of the day', 'Seems to glow in morning light', 'A favourite of returning visitors'],
+                'image_path' => 'haru.jpg',
+            ],
+            [
+                'name' => 'Kaze', 'gender' => 'Male', 'age' => 2, 'color' => 'Red', 'arrived_year' => 2024,
+                'description' => 'Kaze is the fastest fox at the cafe, always darting between tables in a flash of orange. Energetic and mischievous, he turns every visit into a little adventure — keep an eye on your snacks when Kaze is around.',
+                'personality' => ['Energetic', 'Mischievous', 'Quick'],
+                'favourite_treat' => 'Fox Ears Chips', 'favourite_spot' => 'Wherever a snack is unattended',
+                'fun_facts' => ['The fastest fox at the cafe', 'Turns every visit into an adventure', 'Keep an eye on your snacks'],
+                'image_path' => 'kaze.jpg',
+            ],
         ];
 
-        foreach ($foxes as [$name, $description, $imagePath]) {
+        foreach ($foxes as $fox) {
             Animal::create([
-                'name' => $name,
+                ...$fox,
                 'species' => 'fox',
-                'image_path' => $imagePath,
-                'description' => $description,
                 'is_active' => true,
             ]);
         }
