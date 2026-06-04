@@ -30,29 +30,33 @@ new class extends Component
         <div class="flex justify-between h-16">
 
             {{-- Logo + desktop nav links --}}
-            <div class="flex">
+            <div class="flex items-center">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" wire:navigate>
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800 dark:text-zinc-200" />
+                    <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2 group">
+                        <x-application-logo class="block h-9 w-9 text-amber-500 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6" />
+                        <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white leading-none">
+                            Kitsune<span class="text-amber-500"> Cafe</span>
+                        </span>
                     </a>
                 </div>
 
-                <div class="hidden sm:-my-px sm:ms-10 sm:flex sm:items-center sm:gap-6">
+                <div class="hidden sm:ms-10 sm:flex sm:items-center sm:gap-6">
                     @foreach ([['menu.index', 'Menu'], ['animals.index', 'Our Foxes'], ['dashboard', 'Dashboard']] as [$routeName, $label])
                         <a href="{{ route($routeName) }}"
                            wire:navigate
                            @class([
-                               'text-sm font-medium border-b-2 pb-0.5 transition',
-                               'border-amber-500 text-gray-900 dark:text-white' => request()->routeIs($routeName),
-                               'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-zinc-400 dark:hover:text-zinc-200' => ! request()->routeIs($routeName),
+                               'relative text-sm font-medium transition after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:rounded-full after:bg-amber-500 after:transition-all',
+                               'text-gray-900 dark:text-white after:w-full' => request()->routeIs($routeName),
+                               'text-gray-500 hover:text-amber-600 dark:text-zinc-400 dark:hover:text-amber-400 after:w-0 hover:after:w-full' => ! request()->routeIs($routeName),
                            ])>
                             {{ $label }}
                         </a>
                     @endforeach
 
                     <a href="{{ route('cart.index') }}" wire:navigate
-                       class="relative text-gray-500 hover:text-amber-600 transition">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                       aria-label="Cart"
+                       class="relative flex items-center text-gray-500 hover:text-amber-600 transition">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                         </svg>
                         @if ($this->cartCount > 0)
@@ -90,9 +94,21 @@ new class extends Component
                 @else
                     <div class="flex items-center gap-3">
                         <a href="{{ route('login') }}" wire:navigate
-                           class="text-sm text-gray-600 hover:text-gray-900 transition">Log in</a>
-                        <a href="{{ route('register') }}" wire:navigate>
-                            <flux:button size="sm" variant="primary">Register</flux:button>
+                           class="text-sm font-medium text-gray-600 border border-gray-200 rounded-lg px-4 py-1.5
+                                  hover:text-amber-600 hover:border-amber-300 hover:bg-amber-50
+                                  transition-all duration-200
+                                  dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-800">
+                            Log in
+                        </a>
+                        <a href="{{ route('register') }}" wire:navigate
+                           class="text-sm font-semibold text-white rounded-lg px-4 py-1.5
+                                  bg-gradient-to-r from-amber-500 to-orange-400
+                                  hover:from-amber-600 hover:to-orange-500
+                                  hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
+                                  active:translate-y-0 active:scale-[0.97]
+                                  transition-all duration-200
+                                  focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1">
+                            Register
                         </a>
                     </div>
                 @endauth
@@ -155,11 +171,19 @@ new class extends Component
                 </div>
             </div>
         @else
-            <div class="pt-4 pb-1 border-t border-gray-200 px-4 flex gap-4">
+            <div class="pt-4 pb-3 border-t border-gray-200 px-4 flex gap-3">
                 <a href="{{ route('login') }}" wire:navigate
-                   class="text-sm font-medium text-gray-600 hover:text-gray-900">Log in</a>
+                   class="flex-1 text-center text-sm font-medium text-gray-600 border border-gray-200 rounded-lg px-4 py-2
+                          hover:text-amber-600 hover:border-amber-300 hover:bg-amber-50 transition-all duration-200">
+                    Log in
+                </a>
                 <a href="{{ route('register') }}" wire:navigate
-                   class="text-sm font-medium text-amber-600 hover:text-amber-700">Register</a>
+                   class="flex-1 text-center text-sm font-semibold text-white rounded-lg px-4 py-2
+                          bg-gradient-to-r from-amber-500 to-orange-400
+                          hover:from-amber-600 hover:to-orange-500 hover:shadow-lg hover:shadow-amber-300/50
+                          transition-all duration-200">
+                    Register
+                </a>
             </div>
         @endauth
     </div>
