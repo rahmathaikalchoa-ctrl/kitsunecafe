@@ -81,15 +81,24 @@
             {{-- Menu card --}}
             <a href="{{ route('menu.index') }}" wire:navigate
                class="group bg-white rounded-3xl shadow-sm border border-amber-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200">
-                <div class="h-48 bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center overflow-hidden">
-                    {{-- Bowl with steam --}}
-                    <svg class="w-20 h-20 text-amber-500 transition-transform duration-500 group-hover:scale-110" fill="none" viewBox="0 0 80 80" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M23 26 Q26 18 23 11"/>
-                        <path d="M40 23 Q43 15 40 8"/>
-                        <path d="M57 26 Q60 18 57 11"/>
-                        <path d="M10 40 Q10 65 40 65 Q70 65 70 40 Z"/>
-                        <line x1="10" y1="40" x2="70" y2="40"/>
-                    </svg>
+                <div class="h-48 overflow-hidden">
+                    <img
+                        src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=800&q=80"
+                        alt="A bowl of ramen from our menu"
+                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                    />
+                    {{-- Fallback: bowl with steam --}}
+                    <div class="h-48 bg-gradient-to-br from-amber-100 to-orange-100 items-center justify-center" style="display:none">
+                        <svg class="w-20 h-20 text-amber-500" fill="none" viewBox="0 0 80 80" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M23 26 Q26 18 23 11"/>
+                            <path d="M40 23 Q43 15 40 8"/>
+                            <path d="M57 26 Q60 18 57 11"/>
+                            <path d="M10 40 Q10 65 40 65 Q70 65 70 40 Z"/>
+                            <line x1="10" y1="40" x2="70" y2="40"/>
+                        </svg>
+                    </div>
                 </div>
                 <div class="p-8">
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Our Menu</h2>
@@ -109,20 +118,15 @@
             {{-- Animals card --}}
             <a href="{{ route('animals.index') }}" wire:navigate
                class="group bg-white rounded-3xl shadow-sm border border-amber-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200">
-                <div class="h-48 bg-gradient-to-br from-orange-100 to-red-50 flex items-center justify-center overflow-hidden">
-                    {{-- Fox face silhouette --}}
-                    <svg class="w-20 h-20 text-orange-400 transition-transform duration-500 group-hover:scale-110" viewBox="0 0 100 100" fill="currentColor">
-                        <polygon points="28,72 6,14 52,52"/>
-                        <polygon points="72,72 94,14 48,52"/>
-                        <polygon points="28,68 12,22 49,51" fill="white" opacity="0.4"/>
-                        <polygon points="72,68 88,22 51,51" fill="white" opacity="0.4"/>
-                        <circle cx="50" cy="74" r="27"/>
-                        <circle cx="38" cy="70" r="4" fill="white"/>
-                        <circle cx="62" cy="70" r="4" fill="white"/>
-                        <circle cx="39" cy="70" r="2" fill="#1a1a1a"/>
-                        <circle cx="63" cy="70" r="2" fill="#1a1a1a"/>
-                        <ellipse cx="50" cy="79" rx="4" ry="2.5" fill="#c2602a"/>
-                    </svg>
+                <div class="h-48 overflow-hidden">
+                    <img
+                        src="{{ asset('images/animals/kiku.jpg') }}"
+                        alt="One of our resident foxes"
+                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        loading="lazy"
+                        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                    />
+                    <x-fox-placeholder class="h-48" style="display:none" />
                 </div>
                 <div class="p-8">
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Meet the Foxes</h2>
