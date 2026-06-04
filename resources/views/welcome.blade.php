@@ -143,8 +143,37 @@
     </section>
 
     {{-- Footer --}}
-    <footer class="border-t border-amber-100 bg-white py-8 text-center text-sm text-gray-400">
-        &copy; {{ date('Y') }} Kitsune Animal Cafe. All rights reserved.
+    <footer class="border-t border-amber-100 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                {{-- Brand --}}
+                <div>
+                    <div class="flex items-center gap-2.5 mb-3">
+                        <x-application-logo class="h-7 w-7 text-amber-500 shrink-0" />
+                        <span class="font-bold text-lg text-gray-900">Kitsune Animal Cafe</span>
+                    </div>
+                    <p class="text-sm text-gray-500 max-w-xs leading-relaxed">
+                        Handcrafted food, specialty drinks, and six resident foxes. A little magic in every visit.
+                    </p>
+                </div>
+
+                {{-- Explore --}}
+                <div class="md:text-right">
+                    <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">Explore</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="{{ route('menu.index') }}" wire:navigate class="text-gray-500 hover:text-amber-600 transition">Menu</a></li>
+                        <li><a href="{{ route('animals.index') }}" wire:navigate class="text-gray-500 hover:text-amber-600 transition">Our Foxes</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-amber-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-400">
+                <p>&copy; {{ date('Y') }} Kitsune Animal Cafe. All rights reserved.</p>
+                <p>Created by <span class="font-semibold text-gray-600">Rahmat Haikal Choa</span></p>
+            </div>
+        </div>
     </footer>
 
 </body>

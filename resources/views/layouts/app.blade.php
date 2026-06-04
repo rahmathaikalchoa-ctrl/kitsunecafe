@@ -15,7 +15,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen flex flex-col bg-gray-100">
             <livewire:layout.navigation />
 
             <!-- Page Heading -->
@@ -28,9 +28,17 @@
             @endif
 
             <!-- Page Content -->
-            <main>
+            <main class="flex-1">
                 {{ $slot }}
             </main>
+
+            <!-- Footer -->
+            <footer class="border-t border-gray-200 bg-white">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-400">
+                    <p>&copy;2026 Kitsune Animal Cafe</p>
+                    <p>Created by <span class="font-semibold text-gray-600">Rahmat Haikal Choa</span></p>
+                </div>
+            </footer>
         </div>
     </body>
 </html>
