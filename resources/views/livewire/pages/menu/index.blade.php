@@ -42,6 +42,12 @@ new #[Layout('layouts.app')] class extends Component
             ->get();
     }
 
+    #[Computed]
+    public function totalItems(): int
+    {
+        return MenuItem::available()->count();
+    }
+
     // ── Computed: detail modal ────────────────────────────────────────────────
     #[Computed]
     public function selectedItem(): ?MenuItem
@@ -179,6 +185,13 @@ new #[Layout('layouts.app')] class extends Component
      x-on:open-menu-detail-modal.window="modalOpen = true"
      x-on:keydown.escape.window="modalOpen = false; $wire.closeItem()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <p class="text-gray-600 mb-2 max-w-2xl">
+            From hearty ramen and soft tamago sandwiches to matcha lattes and fox-shaped waffles —
+            every dish and drink at Kitsune Animal Cafe is handcrafted with care. Pick your favourites
+            and add them to your cart.
+        </p>
+        <p class="text-sm font-medium text-amber-600 mb-8">{{ $this->totalItems }} {{ Str::plural('item', $this->totalItems) }} on the menu</p>
 
         {{-- Category filter --}}
         <div class="flex flex-wrap gap-2 mb-8">
