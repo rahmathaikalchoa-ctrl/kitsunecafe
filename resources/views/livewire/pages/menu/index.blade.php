@@ -223,9 +223,12 @@ new #[Layout('layouts.app')] class extends Component
             x-on:cart-updated.window="show = true; setTimeout(() => show = false, 2000)"
             x-show="show"
             x-transition
-            class="fixed bottom-6 right-6 bg-gray-900 text-white text-sm px-4 py-2 rounded-xl shadow-lg z-50"
+            class="fixed bottom-6 right-6 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg z-50 flex items-center gap-2"
         >
-            Added to cart ✓
+            <svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+            </svg>
+            Added to cart
         </div>
 
         {{-- ── Backdrop ──────────────────────────────────────────────────────── --}}
