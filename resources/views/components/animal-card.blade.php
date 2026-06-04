@@ -6,9 +6,9 @@
         : null;
 @endphp
 
-<a href="{{ route('animals.show', $animal) }}" wire:navigate
+<button type="button" wire:click="openFox({{ $animal->id }})"
    aria-label="View {{ $animal->name }}'s profile"
-   class="group flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-orange-100/70 hover:border-orange-200">
+   class="group flex flex-col text-left w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-orange-100/70 hover:border-orange-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2">
 
     {{-- Image area — inner overflow-hidden clips the zoom --}}
     <div class="overflow-hidden">
@@ -34,5 +34,11 @@
             </span>
         </div>
         <p class="text-sm text-gray-500 line-clamp-3">{{ $animal->description }}</p>
+        <p class="mt-3 text-sm font-medium text-orange-600 flex items-center gap-1 group-hover:gap-2 transition-all">
+            View profile
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+            </svg>
+        </p>
     </div>
-</a>
+</button>

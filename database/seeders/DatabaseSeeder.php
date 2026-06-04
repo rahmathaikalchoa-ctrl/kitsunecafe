@@ -72,6 +72,9 @@ class DatabaseSeeder extends Seeder
             ['Mochi', 'Mochi is a small, fluffy arctic fox whose coat changes from pure white in winter to sandy brown in summer. He is shy at first but warms up quickly over a bowl of edamame.', 'mochi.jpg'],
             ['Sora', 'Sora arrived at the cafe last spring and is still learning the ropes. She is playful and curious, often stealing guests\' napkins as a game. Staff say she is the troublemaker of the group, in the best possible way.', 'sora.jpg'],
             ['Ren', 'Ren is the eldest fox at Kitsune Animal Cafe and is considered the guardian of the space. He moves slowly and deliberately, and a visit from Ren — who chooses his guests carefully — is said to bring good luck.', 'ren.jpg'],
+            ['Yuki', 'Yuki is a snow-white fox with the softest coat at the cafe. She is calm and a little aloof, preferring quiet corners and the cool tile by the entrance. Regulars say catching Yuki in a playful mood is a rare treat.', 'yuki.jpg'],
+            ['Haru', 'Haru is a warm-hearted fox who seems to glow in the morning light. He loves greeting the first guests of the day and dozing in sunbeams. His gentle eyes have made him a favourite among returning visitors.', 'haru.jpg'],
+            ['Kaze', 'Kaze is the fastest fox at the cafe, always darting between tables in a flash of orange. Energetic and mischievous, he turns every visit into a little adventure — keep an eye on your snacks when Kaze is around.', 'kaze.jpg'],
         ];
 
         foreach ($foxes as [$name, $description, $imagePath]) {
