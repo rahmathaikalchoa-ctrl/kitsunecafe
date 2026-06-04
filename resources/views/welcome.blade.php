@@ -17,11 +17,8 @@
     {{-- Navigation --}}
     <header class="bg-white/80 backdrop-blur border-b border-amber-100 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2.5 font-bold text-lg text-gray-900">
-                {{-- Kitsune spark mark --}}
-                <svg class="w-6 h-6 text-amber-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-                </svg>
+            <a href="/" class="flex items-center gap-2.5 font-bold text-lg text-gray-900 group">
+                <x-application-logo class="h-8 w-8 text-amber-500 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6" />
                 <span>Kitsune Animal Cafe</span>
             </a>
             <livewire:welcome.navigation />
@@ -40,11 +37,24 @@
                 A little magic in every visit.
             </p>
             <div class="flex flex-wrap gap-4 justify-center">
-                <a href="{{ route('menu.index') }}" wire:navigate>
-                    <flux:button variant="primary">View Our Menu</flux:button>
+                <a href="{{ route('menu.index') }}" wire:navigate
+                   class="text-white font-semibold rounded-lg px-6 py-2.5
+                          bg-gradient-to-r from-amber-500 to-orange-400
+                          hover:from-amber-600 hover:to-orange-500
+                          hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
+                          active:translate-y-0 active:scale-[0.97]
+                          transition-all duration-200
+                          focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">
+                    View Our Menu
                 </a>
-                <a href="{{ route('animals.index') }}" wire:navigate>
-                    <flux:button>Meet the Foxes</flux:button>
+                <a href="{{ route('animals.index') }}" wire:navigate
+                   class="font-semibold rounded-lg px-6 py-2.5
+                          border border-amber-300 text-amber-700 bg-white
+                          hover:bg-amber-50 hover:border-amber-400 hover:-translate-y-0.5
+                          active:translate-y-0 active:scale-[0.97]
+                          transition-all duration-200
+                          focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">
+                    Meet the Foxes
                 </a>
             </div>
         </div>
@@ -70,10 +80,10 @@
 
             {{-- Menu card --}}
             <a href="{{ route('menu.index') }}" wire:navigate
-               class="group bg-white rounded-3xl shadow-sm border border-amber-100 overflow-hidden hover:shadow-md transition hover:-translate-y-0.5">
-                <div class="h-48 bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center">
+               class="group bg-white rounded-3xl shadow-sm border border-amber-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200">
+                <div class="h-48 bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center overflow-hidden">
                     {{-- Bowl with steam --}}
-                    <svg class="w-20 h-20 text-amber-500" fill="none" viewBox="0 0 80 80" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg class="w-20 h-20 text-amber-500 transition-transform duration-500 group-hover:scale-110" fill="none" viewBox="0 0 80 80" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M23 26 Q26 18 23 11"/>
                         <path d="M40 23 Q43 15 40 8"/>
                         <path d="M57 26 Q60 18 57 11"/>
@@ -98,10 +108,10 @@
 
             {{-- Animals card --}}
             <a href="{{ route('animals.index') }}" wire:navigate
-               class="group bg-white rounded-3xl shadow-sm border border-amber-100 overflow-hidden hover:shadow-md transition hover:-translate-y-0.5">
-                <div class="h-48 bg-gradient-to-br from-orange-100 to-red-50 flex items-center justify-center">
+               class="group bg-white rounded-3xl shadow-sm border border-amber-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200">
+                <div class="h-48 bg-gradient-to-br from-orange-100 to-red-50 flex items-center justify-center overflow-hidden">
                     {{-- Fox face silhouette --}}
-                    <svg class="w-20 h-20 text-orange-400" viewBox="0 0 100 100" fill="currentColor">
+                    <svg class="w-20 h-20 text-orange-400 transition-transform duration-500 group-hover:scale-110" viewBox="0 0 100 100" fill="currentColor">
                         <polygon points="28,72 6,14 52,52"/>
                         <polygon points="72,72 94,14 48,52"/>
                         <polygon points="28,68 12,22 49,51" fill="white" opacity="0.4"/>

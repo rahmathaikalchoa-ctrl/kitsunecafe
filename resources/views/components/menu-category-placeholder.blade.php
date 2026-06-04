@@ -11,7 +11,7 @@
 @endphp
 
 <div {{ $attributes->class([$config['bg'], 'flex items-center justify-center']) }}>
-    <span class="text-xs font-semibold tracking-widest uppercase {{ $config['text'] }}">
+    <span class="text-xs font-semibold tracking-widest uppercase {{ $config['text'] }}" aria-hidden="true">
         {{ $config['label'] }}
     </span>
 </div>
