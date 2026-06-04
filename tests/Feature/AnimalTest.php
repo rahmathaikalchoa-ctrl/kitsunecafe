@@ -58,3 +58,27 @@ test('opening a fox sets the selected animal', function () {
         ->call('openFox', $animal->id)
         ->assertSet('selectedAnimalId', $animal->id);
 });
+
+test('profile page shows the fox catalog details', function () {
+    $animal = Animal::factory()->create([
+        'name' => 'Kiku',
+        'personality' => ['Gentle', 'Sleepy'],
+        'fun_facts' => ['Was rescued as a tiny kit'],
+        'favourite_treat' => 'Fox Ears Chips',
+    ]);
+
+    $this->get(route('animals.show', $animal))
+        ->assertOk()
+        ->assertSee('Gentle')
+        ->assertSee('Was rescued as a tiny kit')
+        ->assertSee('Fox Ears Chips');
+});
+
+test('profile page links to the next fox', function () {
+    Animal::factory()->create(['name' => 'Aki']);
+    $yuki = Animal::factory()->create(['name' => 'Yuki']);
+
+    $this->get(route('animals.show', Animal::where('name', 'Aki')->first()))
+        ->assertOk()
+        ->assertSee('Yuki');
+});

@@ -100,6 +100,7 @@ new #[Layout('layouts.app')] class extends Component
                     wire:click="$set('color', null)"
                     wire:loading.class="opacity-50 cursor-wait"
                     wire:target="$set('color', null)"
+                    aria-pressed="{{ $color === null ? 'true' : 'false' }}"
                     @class([
                         'px-4 py-1.5 rounded-full text-sm font-medium transition',
                         'bg-amber-500 text-white' => $color === null,
@@ -112,6 +113,7 @@ new #[Layout('layouts.app')] class extends Component
                         wire:click="$set('color', '{{ $c }}')"
                         wire:loading.class="opacity-50 cursor-wait"
                         wire:target="$set('color', '{{ $c }}')"
+                        aria-pressed="{{ $color === $c ? 'true' : 'false' }}"
                         @class([
                             'px-4 py-1.5 rounded-full text-sm font-medium transition',
                             'bg-amber-500 text-white' => $color === $c,

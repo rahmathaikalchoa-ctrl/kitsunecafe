@@ -1,4 +1,4 @@
-<div {{ $attributes->class(['bg-orange-50 flex items-center justify-center']) }}>
+<div {{ $attributes->class(['bg-amber-50 flex items-center justify-center']) }}>
     {{-- Fox face silhouette --}}
     <svg class="w-1/3 h-1/3 text-orange-300" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
         <polygon points="28,72 6,14 52,52"/>
