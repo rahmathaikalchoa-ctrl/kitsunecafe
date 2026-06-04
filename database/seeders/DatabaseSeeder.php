@@ -44,6 +44,10 @@ class DatabaseSeeder extends Seeder
             [$desserts->id, 'Inari Cheesecake',   'Creamy no-bake cheesecake with a sesame cookie crust and tofu caramel.',                   28000, 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=800&q=80'],
             [$snacks->id,   'Edamame Bowl',       'Lightly salted edamame with a side of yuzu dipping sauce.',                                15000, 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80'],
             [$snacks->id,   'Fox Ears Chips',     'House-made taro chips shaped like fox ears, served with miso dip.',                        18000, 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=800&q=80'],
+            [$food->id,     'Kitsune Curry Rice', 'Japanese-style curry with tender vegetables over warm steamed rice.',                      30000, 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?auto=format&fit=crop&w=800&q=80'],
+            [$food->id,     'Sakura Soba',        'Chilled buckwheat noodles served with a savoury dipping broth and scallions.',             28000, 'https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=800&q=80'],
+            [$desserts->id, 'Fox Tail Pudding',   'Silky Japanese-style custard pudding topped with bittersweet caramel.',                    20000, 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80'],
+            [$drinks->id,   'Kitsune Caramel Macchiato', 'Espresso layered with steamed milk and a ribbon of caramel.',                       30000, 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?auto=format&fit=crop&w=800&q=80'],
         ];
 
         foreach ($menuItems as [$categoryId, $name, $description, $priceCents, $imagePath]) {
