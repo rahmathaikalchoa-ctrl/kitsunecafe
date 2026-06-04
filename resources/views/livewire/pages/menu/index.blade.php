@@ -278,7 +278,10 @@ new #[Layout('layouts.app')] class extends Component
              class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
              style="display:none">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl relative my-auto"
-                 x-on:click.stop>
+                 x-on:click.stop
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="menu-item-modal-title">
 
                 {{-- Close button --}}
                 <button type="button"
@@ -301,9 +304,8 @@ new #[Layout('layouts.app')] class extends Component
                         {{-- Top section --}}
                         <div class="flex gap-5 pr-6">
                             @if ($item->image_path)
-                                @php $imageSrc = str_starts_with($item->image_path, 'http') ? $item->image_path : asset('images/menu/' . $item->image_path); @endphp
                                 <img
-                                    src="{{ $imageSrc }}"
+                                    src="{{ $item->imageUrl() }}"
                                     alt="{{ $item->name }}"
                                     class="w-28 h-28 shrink-0 rounded-xl object-cover"
                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
@@ -321,7 +323,7 @@ new #[Layout('layouts.app')] class extends Component
                             @endif
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-start justify-between gap-2">
-                                    <h2 class="text-xl font-bold text-gray-900">{{ $item->name }}</h2>
+                                    <h2 id="menu-item-modal-title" class="text-xl font-bold text-gray-900">{{ $item->name }}</h2>
                                     <span class="shrink-0 text-xs font-medium text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
                                         {{ $item->category->name }}
                                     </span>

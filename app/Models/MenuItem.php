@@ -42,4 +42,15 @@ class MenuItem extends Model
     {
         return $query->where('is_available', true);
     }
+
+    public function imageUrl(): ?string
+    {
+        if (! $this->image_path) {
+            return null;
+        }
+
+        return str_starts_with($this->image_path, 'http')
+            ? $this->image_path
+            : asset('images/menu/'.$this->image_path);
+    }
 }

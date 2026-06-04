@@ -80,7 +80,7 @@ new #[Layout('layouts.app')] class extends Component
             Every fox at Kitsune Animal Cafe has their own story. Get to know them before your visit
             — or better yet, let them find you when you arrive.
         </p>
-        <p class="text-sm font-medium text-orange-600 mb-8">{{ $this->totalFoxes }} resident {{ Str::plural('fox', $this->totalFoxes) }}</p>
+        <p class="text-sm font-medium text-amber-600 mb-8">{{ $this->totalFoxes }} resident {{ Str::plural('fox', $this->totalFoxes) }}</p>
 
         {{-- Search + colour filter --}}
         <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
@@ -92,7 +92,7 @@ new #[Layout('layouts.app')] class extends Component
                        wire:model.live.debounce.300ms="search"
                        placeholder="Search foxes by name…"
                        aria-label="Search foxes by name"
-                       class="w-full pl-9 pr-3 py-1.5 rounded-full border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition" />
+                       class="w-full pl-9 pr-3 py-1.5 rounded-full border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-amber-300 focus:ring-2 focus:ring-amber-100 transition" />
             </div>
 
             <div class="flex flex-wrap gap-2">
@@ -102,8 +102,8 @@ new #[Layout('layouts.app')] class extends Component
                     wire:target="$set('color', null)"
                     @class([
                         'px-4 py-1.5 rounded-full text-sm font-medium transition',
-                        'bg-orange-500 text-white' => $color === null,
-                        'bg-white text-gray-600 border border-gray-200 hover:border-orange-300' => $color !== null,
+                        'bg-amber-500 text-white' => $color === null,
+                        'bg-white text-gray-600 border border-gray-200 hover:border-amber-300' => $color !== null,
                     ])>
                     All
                 </button>
@@ -114,8 +114,8 @@ new #[Layout('layouts.app')] class extends Component
                         wire:target="$set('color', '{{ $c }}')"
                         @class([
                             'px-4 py-1.5 rounded-full text-sm font-medium transition',
-                            'bg-orange-500 text-white' => $color === $c,
-                            'bg-white text-gray-600 border border-gray-200 hover:border-orange-300' => $color !== $c,
+                            'bg-amber-500 text-white' => $color === $c,
+                            'bg-white text-gray-600 border border-gray-200 hover:border-amber-300' => $color !== $c,
                         ])>
                         {{ $c }}
                     </button>
@@ -127,7 +127,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="text-center py-20 text-gray-400">
                 @if ($search !== '' || $color !== null)
                     <p class="text-lg">No foxes match your search.</p>
-                    <button wire:click="$set('search', ''); $set('color', null)" class="mt-3 text-sm font-medium text-orange-600 hover:underline">Clear filters</button>
+                    <button wire:click="$set('search', ''); $set('color', null)" class="mt-3 text-sm font-medium text-amber-600 hover:underline">Clear filters</button>
                 @else
                     <p class="text-lg">No foxes to show right now. Check back soon!</p>
                 @endif
@@ -166,21 +166,19 @@ new #[Layout('layouts.app')] class extends Component
              class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
              style="display:none">
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative my-auto overflow-hidden"
-                 x-on:click.stop>
+                 x-on:click.stop
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="fox-modal-title">
 
                 @if ($this->selectedAnimal)
-                    @php
-                        $fox = $this->selectedAnimal;
-                        $foxImage = $fox->image_path
-                            ? (str_starts_with($fox->image_path, 'http') ? $fox->image_path : asset('images/animals/' . $fox->image_path))
-                            : null;
-                    @endphp
+                    @php $fox = $this->selectedAnimal; @endphp
 
                     {{-- Photo --}}
                     <div class="relative h-64 overflow-hidden">
-                        @if ($foxImage)
+                        @if ($fox->image_path)
                             <img
-                                src="{{ $foxImage }}"
+                                src="{{ $fox->imageUrl() }}"
                                 alt="{{ $fox->name }}"
                                 class="w-full h-full object-cover"
                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
@@ -205,17 +203,27 @@ new #[Layout('layouts.app')] class extends Component
                     {{-- Content --}}
                     <div class="p-6">
                         <div class="flex items-center gap-3 mb-3">
-                            <h2 class="text-2xl font-bold text-gray-900">{{ $fox->name }}</h2>
-                            <span class="text-xs font-medium text-orange-700 bg-orange-50 px-2.5 py-0.5 rounded-full capitalize">
+                            <h2 id="fox-modal-title" class="text-2xl font-bold text-gray-900">{{ $fox->name }}</h2>
+                            <span class="text-xs font-medium text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full capitalize">
                                 {{ $fox->species->value }}
                             </span>
                         </div>
+
+                        @if (! empty($fox->personality))
+                            <div class="flex flex-wrap gap-2 mb-3">
+                                @foreach ($fox->personality as $trait)
+                                    <span class="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-100 px-2.5 py-0.5 rounded-full">
+                                        {{ $trait }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
 
                         <p class="text-gray-600 leading-relaxed">{{ $fox->description }}</p>
 
                         <div class="mt-6 flex items-center justify-between">
                             <a href="{{ route('animals.show', $fox) }}" wire:navigate
-                               class="text-sm font-medium text-orange-600 hover:text-orange-700 hover:underline transition">
+                               class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline transition">
                                 Open full profile
                             </a>
                             <button type="button"

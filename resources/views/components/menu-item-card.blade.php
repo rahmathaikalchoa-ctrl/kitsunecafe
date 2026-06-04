@@ -3,9 +3,6 @@
 @php
     $avg = round($item->reviews->avg('rating') ?? 0, 1);
     $reviewCount = $item->reviews->count();
-    $imageSrc = $item->image_path
-        ? (str_starts_with($item->image_path, 'http') ? $item->image_path : asset('images/menu/' . $item->image_path))
-        : null;
 @endphp
 
 <div @class([
@@ -23,9 +20,9 @@
     >
         {{-- Image area — inner overflow-hidden clips the zoom effect --}}
         <div class="overflow-hidden">
-            @if ($imageSrc)
+            @if ($item->image_path)
                 <img
-                    src="{{ $imageSrc }}"
+                    src="{{ $item->imageUrl() }}"
                     alt="{{ $item->name }}"
                     class="w-full h-40 object-cover transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"

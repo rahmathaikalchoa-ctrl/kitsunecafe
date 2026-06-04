@@ -53,10 +53,6 @@ new #[Layout('layouts.app')] class extends Component
 </x-slot>
 
 @php
-    $imageSrc = $animal->image_path
-        ? (str_starts_with($animal->image_path, 'http') ? $animal->image_path : asset('images/animals/' . $animal->image_path))
-        : null;
-
     $stats = array_filter([
         ['label' => 'Gender', 'value' => $animal->gender, 'path' => 'M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z'],
         ['label' => 'Age', 'value' => $animal->age ? $animal->age . ' ' . Str::plural('year', $animal->age) : null, 'path' => 'M12 8.25v-1.5m0 1.5c-1.355 0-2.697.056-4.024.166C6.845 8.51 6 9.473 6 10.608v2.513m6-4.871c1.355 0 2.697.056 4.024.166C17.155 8.51 18 9.473 18 10.608v2.513m-3-4.871v-1.5m-6 1.5v-1.5m12 9.75-1.5.75a3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0 3.354 3.354 0 0 0-3 0 3.354 3.354 0 0 1-3 0L3 16.5m15-3.379a48.474 48.474 0 0 0-6-.371c-2.032 0-4.034.126-6 .371m12 0c.39.049.777.102 1.163.16 1.07.16 1.837 1.094 1.837 2.175v5.169c0 .621-.504 1.125-1.125 1.125H4.125A1.125 1.125 0 0 1 3 20.625v-5.169c0-1.081.768-2.015 1.837-2.175A48.041 48.041 0 0 1 6 13.12M12.265 3.11a.375.375 0 1 1-.53 0L12 2.845l.265.265Zm-3 0a.375.375 0 1 1-.53 0L9 2.845l.265.265Zm6 0a.375.375 0 1 1-.53 0L15 2.845l.265.265Z'],
@@ -71,9 +67,9 @@ new #[Layout('layouts.app')] class extends Component
         {{-- Hero --}}
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="relative h-80">
-                @if ($imageSrc)
+                @if ($animal->image_path)
                     <img
-                        src="{{ $imageSrc }}"
+                        src="{{ $animal->imageUrl() }}"
                         alt="{{ $animal->name }}"
                         class="w-full h-full object-cover"
                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
@@ -86,7 +82,7 @@ new #[Layout('layouts.app')] class extends Component
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
                 <div class="absolute bottom-0 left-0 p-6 flex items-center gap-3">
                     <h1 class="text-4xl font-bold text-white drop-shadow">{{ $animal->name }}</h1>
-                    <span class="text-xs font-medium text-orange-50 bg-orange-500/80 px-3 py-1 rounded-full capitalize backdrop-blur-sm">
+                    <span class="text-xs font-medium text-amber-50 bg-amber-500/80 px-3 py-1 rounded-full capitalize backdrop-blur-sm">
                         {{ $animal->species->value }}
                     </span>
                 </div>
@@ -98,7 +94,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
                 @foreach ($stats as $stat)
                     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-3">
-                        <span class="shrink-0 w-9 h-9 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center">
+                        <span class="shrink-0 w-9 h-9 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="{{ $stat['path'] }}"/>
                             </svg>
@@ -128,7 +124,7 @@ new #[Layout('layouts.app')] class extends Component
                         <ul class="space-y-3">
                             @foreach ($animal->fun_facts as $fact)
                                 <li class="flex items-start gap-3">
-                                    <span class="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center">
+                                    <span class="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center">
                                         <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
                                         </svg>
@@ -148,7 +144,7 @@ new #[Layout('layouts.app')] class extends Component
                         <h3 class="font-semibold text-gray-800 mb-4">Personality</h3>
                         <div class="flex flex-wrap gap-2">
                             @foreach ($animal->personality as $trait)
-                                <span class="text-sm font-medium text-orange-700 bg-orange-50 border border-orange-100 px-3 py-1 rounded-full">
+                                <span class="text-sm font-medium text-amber-700 bg-amber-50 border border-amber-100 px-3 py-1 rounded-full">
                                     {{ $trait }}
                                 </span>
                             @endforeach
@@ -175,7 +171,7 @@ new #[Layout('layouts.app')] class extends Component
                             @endif
                             @if ($animal->favourite_spot)
                                 <div class="flex items-start gap-3">
-                                    <span class="shrink-0 w-8 h-8 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center">
+                                    <span class="shrink-0 w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
@@ -198,7 +194,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="flex-1">
                 @if ($this->prevFox)
                     <a href="{{ route('animals.show', $this->prevFox) }}" wire:navigate
-                       class="group inline-flex items-center gap-2 text-sm text-gray-500 hover:text-orange-600 transition">
+                       class="group inline-flex items-center gap-2 text-sm text-gray-500 hover:text-amber-600 transition">
                         <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/>
                         </svg>
@@ -215,7 +211,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="flex-1 text-right">
                 @if ($this->nextFox)
                     <a href="{{ route('animals.show', $this->nextFox) }}" wire:navigate
-                       class="group inline-flex items-center gap-2 text-sm text-gray-500 hover:text-orange-600 transition">
+                       class="group inline-flex items-center gap-2 text-sm text-gray-500 hover:text-amber-600 transition">
                         <span>{{ $this->nextFox->name }} · <span class="text-gray-400">Next</span></span>
                         <svg class="w-4 h-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
