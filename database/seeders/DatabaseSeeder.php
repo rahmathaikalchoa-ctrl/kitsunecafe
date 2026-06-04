@@ -48,6 +48,10 @@ class DatabaseSeeder extends Seeder
             [$food->id,     'Sakura Soba',        'Chilled buckwheat noodles served with a savoury dipping broth and scallions.',             28000, 'https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?auto=format&fit=crop&w=800&q=80'],
             [$desserts->id, 'Fox Tail Pudding',   'Silky Japanese-style custard pudding topped with bittersweet caramel.',                    20000, 'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80'],
             [$drinks->id,   'Kitsune Caramel Macchiato', 'Espresso layered with steamed milk and a ribbon of caramel.',                       30000, 'https://images.unsplash.com/photo-1485808191679-5f86510681a2?auto=format&fit=crop&w=800&q=80'],
+            [$food->id,     'Inari Sushi Set',    'Sweet tofu pockets filled with seasoned sushi rice — a true Kitsune favourite.',           32000, 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80'],
+            [$desserts->id, 'Sakura Dorayaki',    'Fluffy pancakes filled with sweet red bean paste and a hint of cherry blossom.',           21000, 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&w=800&q=80'],
+            [$drinks->id,   'Kitsune Hot Cocoa',  'Rich dark hot chocolate topped with fox-shaped marshmallows.',                             26000, 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&w=800&q=80'],
+            [$snacks->id,   'Fox Paw Dango',      'Grilled mochi dango skewers glazed with sweet soy sauce.',                                 17000, 'https://images.unsplash.com/photo-1631709497146-a239ef373cf1?auto=format&fit=crop&w=800&q=80'],
         ];
 
         foreach ($menuItems as [$categoryId, $name, $description, $priceCents, $imagePath]) {

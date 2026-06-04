@@ -306,6 +306,12 @@ new #[Layout('layouts.app')] class extends Component
                                     src="{{ $imageSrc }}"
                                     alt="{{ $item->name }}"
                                     class="w-28 h-28 shrink-0 rounded-xl object-cover"
+                                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+                                />
+                                <x-menu-category-placeholder
+                                    :category="$item->category->name ?? ''"
+                                    class="w-28 h-28 shrink-0 rounded-xl"
+                                    style="display:none"
                                 />
                             @else
                                 <x-menu-category-placeholder
