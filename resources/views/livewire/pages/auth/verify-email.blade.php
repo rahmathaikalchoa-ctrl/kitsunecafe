@@ -30,6 +30,7 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    <h1 class="text-xl font-bold text-gray-900 mb-2">Verify your email</h1>
     <p class="mb-4 text-sm text-gray-600">
         {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
     </p>
@@ -45,7 +46,7 @@ new #[Layout('layouts.guest')] class extends Component
             {{ __('Resend Verification Email') }}
         </flux:button>
 
-        <button wire:click="logout" class="text-sm text-gray-600 hover:text-gray-900 underline">
+        <button wire:click="logout" class="text-sm font-medium text-gray-500 hover:text-amber-600 transition-colors">
             {{ __('Log Out') }}
         </button>
     </div>

@@ -69,7 +69,7 @@ new #[Layout('layouts.app')] class extends Component
 
 <div class="py-10"
      x-data="{ modalOpen: false }"
-     x-effect="document.body.style.overflow = modalOpen ? 'hidden' : ''"
+     x-effect="document.body.style.overflow = modalOpen ? 'hidden' : ''; if (modalOpen) $nextTick(() => $refs.dialog?.focus())"
      x-on:open-fox-modal.window="modalOpen = true"
      x-on:keydown.escape.window="modalOpen = false; $wire.closeFox()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -153,7 +153,9 @@ new #[Layout('layouts.app')] class extends Component
              x-transition:leave-end="opacity-0 scale-95"
              class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
              style="display:none">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative my-auto overflow-hidden"
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative my-auto overflow-hidden focus:outline-none"
+                 x-ref="dialog"
+                 tabindex="-1"
                  x-on:click.stop
                  role="dialog"
                  aria-modal="true"

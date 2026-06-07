@@ -22,6 +22,11 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    <div class="mb-6">
+        <h1 class="text-xl font-bold text-gray-900">Welcome back</h1>
+        <p class="mt-1 text-sm text-gray-500">Log in to order and meet the foxes.</p>
+    </div>
+
     @if (session('status'))
         <div class="mb-4 text-sm font-medium text-green-600">{{ session('status') }}</div>
     @endif
@@ -37,7 +42,7 @@ new #[Layout('layouts.guest')] class extends Component
             <div class="flex justify-between items-center">
                 <flux:label>{{ __('Password') }}</flux:label>
                 @if (Route::has('password.request'))
-                    <a class="text-sm text-gray-600 hover:text-gray-900 underline" href="{{ route('password.request') }}" wire:navigate>
+                    <a class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline" href="{{ route('password.request') }}" wire:navigate>
                         {{ __('Forgot your password?') }}
                     </a>
                 @endif

@@ -22,7 +22,9 @@ new #[Layout('layouts.app')] class extends Component
 
     // ── Review form state ────────────────────────────────────────────────────
     public int $reviewRating = 5;
+
     public string $reviewComment = '';
+
     public bool $editingReview = false;
 
     // ── Computed: menu grid ──────────────────────────────────────────────────
@@ -131,13 +133,7 @@ new #[Layout('layouts.app')] class extends Component
     // ── Actions: reviews ──────────────────────────────────────────────────────
     public function submitReview(): void
     {
-        if (! auth()->check()) {
-            $this->redirect(route('login'), navigate: true);
-
-            return;
-        }
-
-        if (! $this->userHasOrdered) {
+        if (! auth()->check() || ! $this->userHasOrdered) {
             return;
         }
 
@@ -158,6 +154,10 @@ new #[Layout('layouts.app')] class extends Component
 
     public function deleteReview(): void
     {
+        if (! auth()->check()) {
+            return;
+        }
+
         $review = Review::where('user_id', auth()->id())
             ->where('menu_item_id', $this->selectedItemId)
             ->first();
@@ -181,7 +181,7 @@ new #[Layout('layouts.app')] class extends Component
 
 <div class="py-10"
      x-data="{ modalOpen: false }"
-     x-effect="document.body.style.overflow = modalOpen ? 'hidden' : ''"
+     x-effect="document.body.style.overflow = modalOpen ? 'hidden' : ''; if (modalOpen) $nextTick(() => $refs.dialog?.focus())"
      x-on:open-menu-detail-modal.window="modalOpen = true"
      x-on:keydown.escape.window="modalOpen = false; $wire.closeItem()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -290,7 +290,9 @@ new #[Layout('layouts.app')] class extends Component
              x-transition:leave-end="opacity-0 scale-95"
              class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
              style="display:none">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl relative my-auto"
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl relative my-auto focus:outline-none"
+                 x-ref="dialog"
+                 tabindex="-1"
                  x-on:click.stop
                  role="dialog"
                  aria-modal="true"

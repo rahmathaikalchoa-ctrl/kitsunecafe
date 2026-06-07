@@ -34,6 +34,11 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    <div class="mb-6">
+        <h1 class="text-xl font-bold text-gray-900">Join the cafe</h1>
+        <p class="mt-1 text-sm text-gray-500">Create an account to start ordering.</p>
+    </div>
+
     <form wire:submit="register" class="space-y-6">
         <flux:field>
             <flux:label>{{ __('Name') }}</flux:label>
@@ -60,7 +65,7 @@ new #[Layout('layouts.guest')] class extends Component
         </flux:field>
 
         <div class="flex items-center justify-end gap-4">
-            <a class="text-sm text-gray-600 hover:text-gray-900 underline" href="{{ route('login') }}" wire:navigate>
+            <a class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline" href="{{ route('login') }}" wire:navigate>
                 {{ __('Already registered?') }}
             </a>
             <flux:button type="submit" variant="primary">

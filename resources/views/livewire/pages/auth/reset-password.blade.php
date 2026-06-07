@@ -58,6 +58,11 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    <div class="mb-6">
+        <h1 class="text-xl font-bold text-gray-900">Choose a new password</h1>
+        <p class="mt-1 text-sm text-gray-500">Pick a new password to secure your account.</p>
+    </div>
+
     <form wire:submit="resetPassword" class="space-y-6">
         <flux:field>
             <flux:label>{{ __('Email') }}</flux:label>

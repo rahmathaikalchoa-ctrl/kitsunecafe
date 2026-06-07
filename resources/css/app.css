@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Flux UI accent → cafe amber (themes every <flux:button variant="primary"> etc.) */
+:root {
+    --accent: 245 158 11;             /* amber-500 */
+    --accent-content: 217 119 6;      /* amber-600 — hover/active */
+    --accent-foreground: 255 255 255; /* white text on accent */
+}
