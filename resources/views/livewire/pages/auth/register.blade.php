@@ -64,13 +64,34 @@ new #[Layout('layouts.guest')] class extends Component
             <flux:error name="password_confirmation" />
         </flux:field>
 
-        <div class="flex items-center justify-end gap-4">
-            <a class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline" href="{{ route('login') }}" wire:navigate>
-                {{ __('Already registered?') }}
+        <button
+            type="submit"
+            wire:loading.attr="disabled"
+            wire:target="register"
+            class="w-full bg-gradient-to-r from-amber-500 to-orange-400
+                   hover:from-amber-600 hover:to-orange-500
+                   hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
+                   active:translate-y-0 active:shadow-sm active:scale-[0.97]
+                   text-white text-sm font-semibold py-2.5 px-5 rounded-lg
+                   transition-all duration-200
+                   focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
+                   disabled:opacity-60 disabled:cursor-wait disabled:hover:translate-y-0 disabled:hover:shadow-none"
+        >
+            <span wire:loading.remove wire:target="register">{{ __('Create account') }}</span>
+            <span wire:loading wire:target="register" class="flex items-center justify-center gap-1.5">
+                <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                {{ __('Creating account...') }}
+            </span>
+        </button>
+
+        <p class="text-center text-sm text-gray-500">
+            {{ __('Already have an account?') }}
+            <a href="{{ route('login') }}" wire:navigate class="font-medium text-amber-600 hover:text-amber-700 hover:underline">
+                {{ __('Log in') }}
             </a>
-            <flux:button type="submit" variant="primary">
-                {{ __('Register') }}
-            </flux:button>
-        </div>
+        </p>
     </form>
 </div>
