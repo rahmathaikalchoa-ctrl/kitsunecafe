@@ -3,6 +3,10 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    // App is light-only. Gate every `dark:` variant behind a `.dark` class (which we never add)
+    // instead of the OS setting, so dark-mode devices don't turn Flux text white-on-white.
+    darkMode: 'class',
+
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
