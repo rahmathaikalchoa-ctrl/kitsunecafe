@@ -8,3 +8,8 @@
     --accent-content: 217 119 6;      /* amber-600 — hover/active */
     --accent-foreground: 255 255 255; /* white text on accent */
 }
+
+/* Keep Alpine x-cloak elements hidden until Alpine initializes (prevents flash). */
+[x-cloak] {
+    display: none;
+}

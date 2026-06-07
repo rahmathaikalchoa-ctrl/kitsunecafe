@@ -1,27 +1,42 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.guest')] class extends Component
 {
     public string $name = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     public function register(): void
     {
+        $this->ensureIsNotRateLimited();
+
+        // Normalize the email so "John@Gmail.com" is accepted and stored as "john@gmail.com"
+        // (the old `lowercase` rule rejected mixed case instead of fixing it).
+        $this->email = Str::lower($this->email);
+
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        RateLimiter::hit($this->throttleKey(), 60);
 
         $validated['password'] = Hash::make($validated['password']);
 
@@ -31,6 +46,35 @@ new #[Layout('layouts.guest')] class extends Component
 
         $this->redirect(route('dashboard', absolute: false), navigate: true);
     }
+
+    /**
+     * Block the form if this IP has tried to register too many times recently.
+     */
+    protected function ensureIsNotRateLimited(): void
+    {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+            return;
+        }
+
+        event(new Lockout(request()));
+
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'email' => trans('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => ceil($seconds / 60),
+            ]),
+        ]);
+    }
+
+    /**
+     * Rate-limit key for registration: one bucket per client IP.
+     */
+    protected function throttleKey(): string
+    {
+        return Str::transliterate('register:'.request()->ip());
+    }
 }; ?>
 
 <div>
@@ -39,7 +83,22 @@ new #[Layout('layouts.guest')] class extends Component
         <p class="mt-1 text-sm text-gray-500">Create an account to start ordering.</p>
     </div>
 
-    <form wire:submit="register" class="space-y-6">
+    <form wire:submit="register" class="space-y-6"
+          x-data="{
+              pw: '',
+              pwc: '',
+              get score() {
+                  let s = 0;
+                  if (this.pw.length >= 8) s++;
+                  if (/[a-z]/.test(this.pw) && /[A-Z]/.test(this.pw)) s++;
+                  if (/[0-9]/.test(this.pw)) s++;
+                  if (/[^A-Za-z0-9]/.test(this.pw)) s++;
+                  return s;
+              },
+              get label() { return ['Too short', 'Weak', 'Fair', 'Good', 'Strong'][this.score]; },
+              get barColor() { return ['bg-gray-200', 'bg-red-400', 'bg-amber-400', 'bg-amber-500', 'bg-green-500'][this.score]; },
+              get textColor() { return ['text-gray-400', 'text-red-500', 'text-amber-600', 'text-amber-600', 'text-green-600'][this.score]; },
+          }">
         <flux:field>
             <flux:label>{{ __('Name') }}</flux:label>
             <flux:input wire:model="name" type="text" required autofocus autocomplete="name" />
@@ -54,14 +113,32 @@ new #[Layout('layouts.guest')] class extends Component
 
         <flux:field>
             <flux:label>{{ __('Password') }}</flux:label>
-            <flux:input wire:model="password" type="password" viewable required autocomplete="new-password" />
+            <flux:input wire:model="password" type="password" viewable required autocomplete="new-password"
+                x-on:input="pw = $event.target.value" />
             <flux:error name="password" />
+
+            {{-- Live strength hint (client-side only; server still enforces the real rules) --}}
+            <div class="mt-2" x-show="pw.length > 0" x-cloak>
+                <div class="flex gap-1">
+                    <template x-for="i in 4" :key="i">
+                        <div class="h-1.5 flex-1 rounded-full transition-colors" :class="i <= score ? barColor : 'bg-gray-200'"></div>
+                    </template>
+                </div>
+                <p class="mt-1 text-xs" :class="textColor" x-text="label"></p>
+            </div>
+            <p class="mt-1 text-xs text-gray-400" x-show="pw.length === 0">{{ __('Use at least 8 characters.') }}</p>
         </flux:field>
 
         <flux:field>
             <flux:label>{{ __('Confirm Password') }}</flux:label>
-            <flux:input wire:model="password_confirmation" type="password" viewable required autocomplete="new-password" />
+            <flux:input wire:model="password_confirmation" type="password" viewable required autocomplete="new-password"
+                x-on:input="pwc = $event.target.value" />
             <flux:error name="password_confirmation" />
+
+            {{-- Live "do they match?" hint --}}
+            <p class="mt-1 text-xs" x-show="pwc.length > 0" x-cloak
+               :class="pw === pwc ? 'text-green-600' : 'text-gray-500'"
+               x-text="pw === pwc ? 'Passwords match' : 'Passwords do not match yet'"></p>
         </flux:field>
 
         <button

@@ -8,6 +8,20 @@ test('registration screen can be rendered', function () {
         ->assertSeeVolt('pages.auth.register');
 });
 
+test('registration normalizes a mixed-case email to lowercase', function () {
+    Volt::test('pages.auth.register')
+        ->set('name', 'Test User')
+        ->set('email', 'Test@Example.com')
+        ->set('password', 'password')
+        ->set('password_confirmation', 'password')
+        ->call('register')
+        ->assertHasNoErrors()
+        ->assertRedirect(route('dashboard', absolute: false));
+
+    // The mixed-case input must be stored normalized as lowercase.
+    $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
+});
+
 test('new users can register', function () {
     Volt::test('pages.auth.register')
         ->set('name', 'Test User')
