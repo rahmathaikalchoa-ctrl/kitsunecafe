@@ -39,7 +39,7 @@ new #[Layout('layouts.guest')] class extends Component
     <form wire:submit="confirmPassword" class="space-y-6">
         <flux:field>
             <flux:label>{{ __('Password') }}</flux:label>
-            <flux:input wire:model="password" type="password" required autocomplete="current-password" />
+            <flux:input wire:model="password" type="password" viewable required autocomplete="current-password" />
             <flux:error name="password" />
         </flux:field>
 

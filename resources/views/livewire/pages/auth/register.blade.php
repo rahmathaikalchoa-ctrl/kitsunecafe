@@ -54,13 +54,13 @@ new #[Layout('layouts.guest')] class extends Component
 
         <flux:field>
             <flux:label>{{ __('Password') }}</flux:label>
-            <flux:input wire:model="password" type="password" required autocomplete="new-password" />
+            <flux:input wire:model="password" type="password" viewable required autocomplete="new-password" />
             <flux:error name="password" />
         </flux:field>
 
         <flux:field>
             <flux:label>{{ __('Confirm Password') }}</flux:label>
-            <flux:input wire:model="password_confirmation" type="password" required autocomplete="new-password" />
+            <flux:input wire:model="password_confirmation" type="password" viewable required autocomplete="new-password" />
             <flux:error name="password_confirmation" />
         </flux:field>
 
