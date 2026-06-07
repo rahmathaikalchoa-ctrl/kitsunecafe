@@ -48,5 +48,7 @@
                 &larr; Back to cafe
             </a>
         </div>
+
+        @fluxScripts
     </body>
 </html>

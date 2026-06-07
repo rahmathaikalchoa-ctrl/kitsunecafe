@@ -43,5 +43,7 @@
                 </div>
             </footer>
         </div>
+
+        @fluxScripts
     </body>
 </html>
