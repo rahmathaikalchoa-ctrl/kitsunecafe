@@ -14,17 +14,17 @@
 
         @auth
             <a href="{{ url('/dashboard') }}" wire:navigate
-               class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-black/70 dark:text-white dark:hover:text-white/80">
+               class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
                 Dashboard
             </a>
         @else
             <a href="{{ route('login') }}" wire:navigate
-               class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-black/70 dark:text-white dark:hover:text-white/80">
+               class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
                 Log in
             </a>
             @if (Route::has('register'))
                 <a href="{{ route('register') }}" wire:navigate
-                   class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-black/70 dark:text-white dark:hover:text-white/80">
+                   class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
                     Register
                 </a>
             @endif
@@ -59,12 +59,12 @@
             <div class="border-t border-gray-100 my-1"></div>
             @auth
                 <a href="{{ url('/dashboard') }}" wire:navigate
-                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
                     Dashboard
                 </a>
             @else
                 <a href="{{ route('login') }}" wire:navigate
-                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
                     Log in
                 </a>
                 @if (Route::has('register'))
