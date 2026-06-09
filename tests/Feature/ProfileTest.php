@@ -33,6 +33,24 @@ test('profile information can be updated', function () {
         ->and($user->email_verified_at)->toBeNull();
 });
 
+test('profile email and name are normalized when updated', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    Volt::test('profile.update-profile-information-form')
+        ->set('name', '  New Name ')
+        ->set('email', '  NEW@Example.com ')
+        ->call('updateProfileInformation')
+        ->assertHasNoErrors()
+        ->assertNoRedirect();
+
+    $user->refresh();
+
+    expect($user->email)->toBe('new@example.com')
+        ->and($user->name)->toBe('New Name');
+});
+
 test('email verification status is unchanged when email address is unchanged', function () {
     $user = User::factory()->create();
 

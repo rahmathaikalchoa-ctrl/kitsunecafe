@@ -43,7 +43,7 @@ new class extends Component
 
             <flux:field>
                 <flux:label class="sr-only">{{ __('Password') }}</flux:label>
-                <flux:input wire:model="password" type="password" placeholder="{{ __('Password') }}" />
+                <flux:input wire:model="password" type="password" viewable placeholder="{{ __('Password') }}" />
                 <flux:error name="password" />
             </flux:field>
 

@@ -9,7 +9,9 @@ use Livewire\Volt\Component;
 new class extends Component
 {
     public string $current_password = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     public function updatePassword(): void
@@ -41,23 +43,55 @@ new class extends Component
         <p class="mt-1 text-sm text-gray-600">{{ __('Ensure your account is using a long, random password to stay secure.') }}</p>
     </header>
 
-    <form wire:submit="updatePassword" class="mt-6 space-y-6">
+    <form wire:submit="updatePassword" class="mt-6 space-y-6"
+          x-data="{
+              pw: '',
+              pwc: '',
+              get score() {
+                  let s = 0;
+                  if (this.pw.length >= 8) s++;
+                  if (/[a-z]/.test(this.pw) && /[A-Z]/.test(this.pw)) s++;
+                  if (/[0-9]/.test(this.pw)) s++;
+                  if (/[^A-Za-z0-9]/.test(this.pw)) s++;
+                  return s;
+              },
+              get label() { return ['Too short', 'Weak', 'Fair', 'Good', 'Strong'][this.score]; },
+              get barColor() { return ['bg-gray-200', 'bg-red-400', 'bg-amber-400', 'bg-amber-500', 'bg-green-500'][this.score]; },
+              get textColor() { return ['text-gray-400', 'text-red-500', 'text-amber-600', 'text-amber-600', 'text-green-600'][this.score]; },
+          }">
         <flux:field>
             <flux:label>{{ __('Current Password') }}</flux:label>
-            <flux:input wire:model="current_password" type="password" autocomplete="current-password" />
+            <flux:input wire:model="current_password" type="password" viewable autocomplete="current-password" />
             <flux:error name="current_password" />
         </flux:field>
 
         <flux:field>
             <flux:label>{{ __('New Password') }}</flux:label>
-            <flux:input wire:model="password" type="password" autocomplete="new-password" />
+            <flux:input wire:model="password" type="password" viewable autocomplete="new-password"
+                x-on:input="pw = $event.target.value" />
             <flux:error name="password" />
+
+            {{-- Live strength hint (client-side only; server still enforces the real rules) --}}
+            <div class="mt-2" x-show="pw.length > 0" x-cloak>
+                <div class="flex gap-1" aria-hidden="true">
+                    <template x-for="i in 4" :key="i">
+                        <div class="h-1.5 flex-1 rounded-full transition-colors" :class="i <= score ? barColor : 'bg-gray-200'"></div>
+                    </template>
+                </div>
+                <p class="mt-1 text-xs" aria-live="polite" :class="textColor" x-text="label"></p>
+            </div>
         </flux:field>
 
         <flux:field>
             <flux:label>{{ __('Confirm Password') }}</flux:label>
-            <flux:input wire:model="password_confirmation" type="password" autocomplete="new-password" />
+            <flux:input wire:model="password_confirmation" type="password" viewable autocomplete="new-password"
+                x-on:input="pwc = $event.target.value" />
             <flux:error name="password_confirmation" />
+
+            {{-- Live "do they match?" hint --}}
+            <p class="mt-1 text-xs" x-show="pwc.length > 0" x-cloak aria-live="polite"
+               :class="pw === pwc ? 'text-green-600' : 'text-gray-500'"
+               x-text="pw === pwc ? 'Passwords match' : 'Passwords do not match yet'"></p>
         </flux:field>
 
         <div class="flex items-center gap-4">

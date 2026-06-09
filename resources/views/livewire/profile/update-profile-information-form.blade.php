@@ -3,12 +3,14 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
 
 new class extends Component
 {
     public string $name = '';
+
     public string $email = '';
 
     public function mount(): void
@@ -21,9 +23,14 @@ new class extends Component
     {
         $user = Auth::user();
 
+        // Normalize like the rest of the app: trim stray spaces and lowercase the email so it
+        // stores canonically (the old `lowercase` rule rejected mixed case instead of fixing it).
+        $this->name = trim($this->name);
+        $this->email = Str::lower(trim($this->email));
+
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
         ]);
 
         $user->fill($validated);
