@@ -61,9 +61,16 @@ new class extends Component
 }; ?>
 
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">{{ __('Profile Information') }}</h2>
-        <p class="mt-1 text-sm text-gray-600">{{ __("Update your account's profile information and email address.") }}</p>
+    <header class="flex items-start gap-3">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+        </span>
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900">{{ __('Profile Information') }}</h2>
+            <p class="mt-0.5 text-sm text-gray-500">{{ __("Update your account's profile information and email address.") }}</p>
+        </div>
     </header>
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
