@@ -44,7 +44,9 @@ new #[Layout('layouts.guest')] class extends Component
 
         Auth::login($user);
 
-        $this->redirect(route('dashboard', absolute: false), navigate: true);
+        // A new customer is logged in immediately, so land them on the menu (same as login),
+        // not the dashboard.
+        $this->redirect(route('menu.index', absolute: false), navigate: true);
     }
 
     /**

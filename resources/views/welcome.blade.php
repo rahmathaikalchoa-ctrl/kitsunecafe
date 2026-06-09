@@ -159,7 +159,7 @@
                         <span class="font-bold text-lg text-gray-900">Kitsune Animal Cafe</span>
                     </div>
                     <p class="text-sm text-gray-500 max-w-xs leading-relaxed">
-                        Handcrafted food, specialty drinks, and six resident foxes. A little magic in every visit.
+                        A cosy corner for handcrafted plates, small-batch coffee, and the company of our six resident foxes — where every visit feels a little like magic.
                     </p>
                 </div>
 

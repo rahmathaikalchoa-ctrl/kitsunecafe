@@ -17,7 +17,10 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        // Send customers to the menu by default; the dashboard is only reached when
+        // they choose it from the nav. (redirectIntended still returns them to a page
+        // they were bounced from, e.g. cart/checkout, if one was remembered.)
+        $this->redirectIntended(default: route('menu.index', absolute: false), navigate: true);
     }
 }; ?>
 
