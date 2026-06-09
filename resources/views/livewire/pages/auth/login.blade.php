@@ -2,6 +2,7 @@
 
 use App\Livewire\Forms\LoginForm;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -11,6 +12,10 @@ new #[Layout('layouts.guest')] class extends Component
 
     public function login(): void
     {
+        // Normalize BEFORE validating: the `email` rule rejects surrounding spaces, and trimming +
+        // lowercasing here lets a space-padded / mixed-case email match the stored value.
+        $this->form->email = Str::lower(trim($this->form->email));
+
         $this->validate();
 
         $this->form->authenticate();
@@ -37,7 +42,8 @@ new #[Layout('layouts.guest')] class extends Component
     <form wire:submit="login" class="space-y-6">
         <flux:field>
             <flux:label>{{ __('Email') }}</flux:label>
-            <flux:input wire:model="form.email" type="email" required autofocus autocomplete="username" />
+            <flux:input wire:model="form.email" type="email" required autofocus autocomplete="username"
+                autocapitalize="none" autocorrect="off" inputmode="email" />
             <flux:error name="form.email" />
         </flux:field>
 

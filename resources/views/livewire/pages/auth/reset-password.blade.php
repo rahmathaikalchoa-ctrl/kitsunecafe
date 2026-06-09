@@ -30,9 +30,9 @@ new #[Layout('layouts.guest')] class extends Component
 
     public function resetPassword(): void
     {
-        // Normalize the email so the reset matches the lowercased value stored at registration
-        // (the field is pre-filled from the link but the user can edit it).
-        $this->email = Str::lower($this->email);
+        // Normalize the email (trim stray spaces + lowercase) so the reset matches the value
+        // stored at registration (the field is pre-filled from the link but the user can edit it).
+        $this->email = Str::lower(trim($this->email));
 
         $this->validate([
             'token' => ['required'],
@@ -73,7 +73,8 @@ new #[Layout('layouts.guest')] class extends Component
     <form wire:submit="resetPassword" class="space-y-6">
         <flux:field>
             <flux:label>{{ __('Email') }}</flux:label>
-            <flux:input wire:model="email" type="email" required autofocus autocomplete="username" />
+            <flux:input wire:model="email" type="email" required autofocus autocomplete="username"
+                autocapitalize="none" autocorrect="off" inputmode="email" />
             <flux:error name="email" />
         </flux:field>
 

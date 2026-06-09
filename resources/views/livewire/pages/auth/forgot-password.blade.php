@@ -16,14 +16,17 @@ new #[Layout('layouts.guest')] class extends Component
     {
         $this->ensureIsNotRateLimited();
 
-        // Normalize the email so the lookup matches the lowercased value stored at registration.
-        $this->email = Str::lower($this->email);
+        // Count this submission BEFORE validating so malformed/spam attempts also count toward
+        // the throttle.
+        RateLimiter::hit($this->throttleKey(), 60);
+
+        // Normalize the email (trim stray spaces + lowercase) so the lookup matches the value
+        // stored at registration.
+        $this->email = Str::lower(trim($this->email));
 
         $this->validate([
             'email' => ['required', 'string', 'email'],
         ]);
-
-        RateLimiter::hit($this->throttleKey(), 60);
 
         $status = Password::sendResetLink(
             $this->only('email')
@@ -83,7 +86,8 @@ new #[Layout('layouts.guest')] class extends Component
     <form wire:submit="sendPasswordResetLink" class="space-y-6">
         <flux:field>
             <flux:label>{{ __('Email') }}</flux:label>
-            <flux:input wire:model="email" type="email" required autofocus />
+            <flux:input wire:model="email" type="email" required autofocus
+                autocapitalize="none" autocorrect="off" inputmode="email" />
             <flux:error name="email" />
         </flux:field>
 

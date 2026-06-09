@@ -26,17 +26,20 @@ new #[Layout('layouts.guest')] class extends Component
     {
         $this->ensureIsNotRateLimited();
 
-        // Normalize the email so "John@Gmail.com" is accepted and stored as "john@gmail.com"
-        // (the old `lowercase` rule rejected mixed case instead of fixing it).
-        $this->email = Str::lower($this->email);
+        // Count this submission BEFORE validating, so malformed/spam attempts also count toward
+        // the throttle (otherwise a bot sending invalid data would never get rate-limited).
+        RateLimiter::hit($this->throttleKey(), 60);
+
+        // Normalize input: trim() strips stray spaces (mobile keyboards) and Str::lower() makes
+        // "John@Gmail.com" store as "john@gmail.com" so logins later match on any database.
+        $this->name = trim($this->name);
+        $this->email = Str::lower(trim($this->email));
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
-
-        RateLimiter::hit($this->throttleKey(), 60);
 
         $validated['password'] = Hash::make($validated['password']);
 
@@ -109,7 +112,8 @@ new #[Layout('layouts.guest')] class extends Component
 
         <flux:field>
             <flux:label>{{ __('Email') }}</flux:label>
-            <flux:input wire:model="email" type="email" required autocomplete="username" />
+            <flux:input wire:model="email" type="email" required autocomplete="username"
+                autocapitalize="none" autocorrect="off" inputmode="email" />
             <flux:error name="email" />
         </flux:field>
 
@@ -121,12 +125,12 @@ new #[Layout('layouts.guest')] class extends Component
 
             {{-- Live strength hint (client-side only; server still enforces the real rules) --}}
             <div class="mt-2" x-show="pw.length > 0" x-cloak>
-                <div class="flex gap-1">
+                <div class="flex gap-1" aria-hidden="true">
                     <template x-for="i in 4" :key="i">
                         <div class="h-1.5 flex-1 rounded-full transition-colors" :class="i <= score ? barColor : 'bg-gray-200'"></div>
                     </template>
                 </div>
-                <p class="mt-1 text-xs" :class="textColor" x-text="label"></p>
+                <p class="mt-1 text-xs" aria-live="polite" :class="textColor" x-text="label"></p>
             </div>
             <p class="mt-1 text-xs text-gray-400" x-show="pw.length === 0">{{ __('Use at least 8 characters.') }}</p>
         </flux:field>
@@ -138,7 +142,7 @@ new #[Layout('layouts.guest')] class extends Component
             <flux:error name="password_confirmation" />
 
             {{-- Live "do they match?" hint --}}
-            <p class="mt-1 text-xs" x-show="pwc.length > 0" x-cloak
+            <p class="mt-1 text-xs" x-show="pwc.length > 0" x-cloak aria-live="polite"
                :class="pw === pwc ? 'text-green-600' : 'text-gray-500'"
                x-text="pw === pwc ? 'Passwords match' : 'Passwords do not match yet'"></p>
         </flux:field>
