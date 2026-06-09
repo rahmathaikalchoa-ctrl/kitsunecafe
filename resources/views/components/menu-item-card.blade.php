@@ -6,7 +6,7 @@
 @endphp
 
 <div @class([
-    'group flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200',
+    'group flex flex-col bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200',
     'opacity-60' => ! $item->is_available,
 ])>
     {{-- Clickable top section → opens detail modal (disabled when item unavailable) --}}
@@ -14,7 +14,7 @@
         @if ($item->is_available) wire:click="openItem({{ $item->id }})" @endif
         type="button"
         @class([
-            'w-full text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-inset',
+            'w-full text-left focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-inset',
             'cursor-not-allowed pointer-events-none' => ! $item->is_available,
         ])
     >
@@ -83,13 +83,13 @@
                 wire:loading.class="opacity-60 cursor-wait"
                 wire:target="addToCart({{ $item->id }})"
                 type="button"
-                class="w-full bg-gradient-to-r from-amber-500 to-orange-400
+                class="w-full bg-linear-to-r from-amber-500 to-orange-400
                        hover:from-amber-600 hover:to-orange-500
                        hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
-                       active:translate-y-0 active:shadow-sm active:scale-[0.97]
+                       active:translate-y-0 active:shadow-xs active:scale-[0.97]
                        text-white text-sm font-semibold py-2 px-4 rounded-lg
                        transition-all duration-200
-                       focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
+                       focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
                        disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:active:scale-100"
             >
                 <span wire:loading.remove wire:target="addToCart({{ $item->id }})">Add to Cart</span>

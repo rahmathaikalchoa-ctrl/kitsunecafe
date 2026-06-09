@@ -10,7 +10,7 @@
 
 <button type="button" wire:click="openFox({{ $animal->id }})"
    aria-label="View {{ $animal->name }}'s profile"
-   class="group flex flex-col text-left w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">
+   class="group flex flex-col text-left w-full bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">
 
     {{-- Image area — inner overflow-hidden clips the zoom --}}
     <div class="overflow-hidden">

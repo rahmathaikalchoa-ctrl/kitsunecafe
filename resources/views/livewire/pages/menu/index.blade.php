@@ -290,7 +290,7 @@ new #[Layout('layouts.app')] class extends Component
              x-transition:leave-end="opacity-0 scale-95"
              class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
              style="display:none">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl relative my-auto focus:outline-none"
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl relative my-auto focus:outline-hidden"
                  x-ref="dialog"
                  tabindex="-1"
                  x-on:click.stop
@@ -357,13 +357,13 @@ new #[Layout('layouts.app')] class extends Component
                                             wire:loading.class="opacity-60 cursor-wait"
                                             wire:target="addToCart({{ $item->id }})"
                                             type="button"
-                                            class="bg-gradient-to-r from-amber-500 to-orange-400
+                                            class="bg-linear-to-r from-amber-500 to-orange-400
                                                    hover:from-amber-600 hover:to-orange-500
                                                    hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
-                                                   active:translate-y-0 active:shadow-sm active:scale-[0.97]
+                                                   active:translate-y-0 active:shadow-xs active:scale-[0.97]
                                                    text-white text-sm font-semibold py-2 px-5 rounded-lg
                                                    transition-all duration-200
-                                                   focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
+                                                   focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
                                                    disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
                                         >
                                             <span wire:loading.remove wire:target="addToCart({{ $item->id }})">Add to Cart</span>
@@ -472,7 +472,7 @@ new #[Layout('layouts.app')] class extends Component
                                                     @for ($i = 1; $i <= 5; $i++)
                                                         <button type="button" wire:click="$set('reviewRating', {{ $i }})"
                                                                 aria-label="Rate {{ $i }} {{ $i === 1 ? 'star' : 'stars' }}"
-                                                                class="focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1 rounded transition-transform hover:scale-110">
+                                                                class="focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1 rounded-sm transition-transform hover:scale-110">
                                                             <svg viewBox="0 0 20 20" aria-hidden="true" @class(['w-7 h-7 fill-current transition', $i <= $reviewRating ? 'text-amber-400' : 'text-gray-200'])>
                                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                                                             </svg>

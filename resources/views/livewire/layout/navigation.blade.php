@@ -87,13 +87,11 @@ new class extends Component
                         />
 
                         <flux:menu>
-                            <flux:menu.item href="{{ route('profile') }}" icon="user" wire:navigate
-                                class="transition-colors hover:bg-amber-50 hover:text-amber-700">
+                            <flux:menu.item href="{{ route('profile') }}" icon="user" wire:navigate>
                                 {{ __('Profile') }}
                             </flux:menu.item>
                             <flux:menu.separator />
-                            <flux:menu.item wire:click="logout" icon="arrow-right-start-on-rectangle"
-                                class="transition-colors hover:bg-red-50 hover:text-red-600">
+                            <flux:menu.item wire:click="logout" icon="arrow-right-start-on-rectangle" variant="danger">
                                 {{ __('Log Out') }}
                             </flux:menu.item>
                         </flux:menu>
@@ -109,12 +107,12 @@ new class extends Component
                         </a>
                         <a href="{{ route('register') }}" wire:navigate
                            class="text-sm font-semibold text-white rounded-lg px-4 py-1.5
-                                  bg-gradient-to-r from-amber-500 to-orange-400
+                                  bg-linear-to-r from-amber-500 to-orange-400
                                   hover:from-amber-600 hover:to-orange-500
                                   hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
                                   active:translate-y-0 active:scale-[0.97]
                                   transition-all duration-200
-                                  focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1">
+                                  focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1">
                             Register
                         </a>
                     </div>
@@ -124,7 +122,7 @@ new class extends Component
             {{-- Hamburger (mobile) --}}
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open"
-                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none transition duration-150 ease-in-out">
+                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-hidden transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open}" class="inline-flex"
                               stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -186,7 +184,7 @@ new class extends Component
                 </a>
                 <a href="{{ route('register') }}" wire:navigate
                    class="flex-1 text-center text-sm font-semibold text-white rounded-lg px-4 py-2
-                          bg-gradient-to-r from-amber-500 to-orange-400
+                          bg-linear-to-r from-amber-500 to-orange-400
                           hover:from-amber-600 hover:to-orange-500 hover:shadow-lg hover:shadow-amber-300/50
                           transition-all duration-200">
                     Register

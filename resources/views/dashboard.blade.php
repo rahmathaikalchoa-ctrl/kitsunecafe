@@ -13,7 +13,7 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white overflow-hidden shadow-xs sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     Welcome back, {{ auth()->user()->name }}! Ready to order?
                     <a href="{{ route('menu.index') }}" wire:navigate class="ml-2 text-amber-600 underline font-medium">Browse the menu →</a>

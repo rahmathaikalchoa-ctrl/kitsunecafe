@@ -1,12 +1,42 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import '../../vendor/livewire/flux/dist/flux.css';
 
-/* Flux UI accent → cafe amber (themes every <flux:button variant="primary"> etc.) */
-:root {
-    --accent: 245 158 11;             /* amber-500 */
-    --accent-content: 217 119 6;      /* amber-600 — hover/active */
-    --accent-foreground: 255 255 255; /* white text on accent */
+@plugin '@tailwindcss/forms';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/* App is light-only: gate every `dark:` behind a `.dark` class we never add. */
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans:
+    Figtree, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  /* Brand: theme Flux's accent to cafe amber. Tailwind v4 / Flux read --color-accent*
+     (the old v3 `--accent` RGB triplet no longer applies). */
+  --color-accent: var(--color-amber-500);
+  --color-accent-content: var(--color-amber-600);
+  --color-accent-foreground: var(--color-white);
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
 /* Keep Alpine x-cloak elements hidden until Alpine initializes (prevents flash). */

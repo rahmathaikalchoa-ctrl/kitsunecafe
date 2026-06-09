@@ -153,7 +153,7 @@ new #[Layout('layouts.app')] class extends Component
              x-transition:leave-end="opacity-0 scale-95"
              class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
              style="display:none">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative my-auto overflow-hidden focus:outline-none"
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative my-auto overflow-hidden focus:outline-hidden"
                  x-ref="dialog"
                  tabindex="-1"
                  x-on:click.stop
@@ -179,11 +179,11 @@ new #[Layout('layouts.app')] class extends Component
                         @endif
 
                         {{-- Gradient + close button overlay --}}
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none"></div>
+                        <div class="absolute inset-0 bg-linear-to-t from-black/40 to-transparent pointer-events-none"></div>
                         <button type="button"
                                 aria-label="Close"
                                 x-on:click="modalOpen = false; $wire.closeFox()"
-                                class="absolute top-3 right-3 bg-white/90 hover:bg-white text-gray-600 hover:text-gray-900 rounded-full p-1.5 shadow transition">
+                                class="absolute top-3 right-3 bg-white/90 hover:bg-white text-gray-600 hover:text-gray-900 rounded-full p-1.5 shadow-sm transition">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                             </svg>

@@ -54,7 +54,7 @@ new #[Layout('layouts.app')] class extends Component
             <form wire:submit="placeOrder" class="space-y-6">
 
                 {{-- Order summary --}}
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-100">
                         <h3 class="font-semibold text-gray-800">Order Summary</h3>
                     </div>

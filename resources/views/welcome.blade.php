@@ -16,7 +16,7 @@
 <body class="antialiased font-sans bg-amber-50 text-gray-900">
 
     {{-- Navigation --}}
-    <header class="bg-white/80 backdrop-blur border-b border-amber-100 sticky top-0 z-50">
+    <header class="bg-white/80 backdrop-blur-sm border-b border-amber-100 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <a href="/" class="flex items-center gap-2.5 font-bold text-lg text-gray-900 group">
                 <x-application-logo class="h-8 w-8 text-amber-500 shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6" />
@@ -27,7 +27,7 @@
     </header>
 
     {{-- Hero --}}
-    <section class="relative overflow-hidden bg-gradient-to-b from-amber-100 to-amber-50 py-24 px-4">
+    <section class="relative overflow-hidden bg-linear-to-b from-amber-100 to-amber-50 py-24 px-4">
         <div class="max-w-4xl mx-auto text-center">
             <p class="text-amber-600 font-semibold tracking-widest uppercase text-sm mb-4">Welcome to</p>
             <h1 class="text-5xl sm:text-6xl font-bold text-gray-900 leading-tight mb-6">
@@ -40,12 +40,12 @@
             <div class="flex flex-wrap gap-4 justify-center">
                 <a href="{{ route('menu.index') }}" wire:navigate
                    class="text-white font-semibold rounded-lg px-6 py-2.5
-                          bg-gradient-to-r from-amber-500 to-orange-400
+                          bg-linear-to-r from-amber-500 to-orange-400
                           hover:from-amber-600 hover:to-orange-500
                           hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
                           active:translate-y-0 active:scale-[0.97]
                           transition-all duration-200
-                          focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">
+                          focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">
                     View Our Menu
                 </a>
                 <a href="{{ route('animals.index') }}" wire:navigate
@@ -54,7 +54,7 @@
                           hover:bg-amber-50 hover:border-amber-400 hover:-translate-y-0.5
                           active:translate-y-0 active:scale-[0.97]
                           transition-all duration-200
-                          focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">
+                          focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">
                     Meet the Foxes
                 </a>
             </div>
@@ -81,7 +81,7 @@
 
             {{-- Menu card --}}
             <a href="{{ route('menu.index') }}" wire:navigate
-               class="group bg-white rounded-3xl shadow-sm border border-amber-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200">
+               class="group bg-white rounded-3xl shadow-xs border border-amber-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200">
                 <div class="h-48 overflow-hidden">
                     <img
                         src="https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?auto=format&fit=crop&w=800&q=80"
@@ -91,7 +91,7 @@
                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
                     />
                     {{-- Fallback: bowl with steam --}}
-                    <div class="h-48 bg-gradient-to-br from-amber-100 to-orange-100 items-center justify-center" style="display:none">
+                    <div class="h-48 bg-linear-to-br from-amber-100 to-orange-100 items-center justify-center" style="display:none">
                         <svg class="w-20 h-20 text-amber-500" fill="none" viewBox="0 0 80 80" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M23 26 Q26 18 23 11"/>
                             <path d="M40 23 Q43 15 40 8"/>
@@ -118,7 +118,7 @@
 
             {{-- Animals card --}}
             <a href="{{ route('animals.index') }}" wire:navigate
-               class="group bg-white rounded-3xl shadow-sm border border-amber-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200">
+               class="group bg-white rounded-3xl shadow-xs border border-amber-100 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200">
                 <div class="h-48 overflow-hidden">
                     <img
                         src="{{ asset('images/animals/kiku.jpg') }}"

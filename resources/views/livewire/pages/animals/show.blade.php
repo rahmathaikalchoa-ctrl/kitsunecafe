@@ -65,7 +65,7 @@ new #[Layout('layouts.app')] class extends Component
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Hero --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden">
             <div class="relative h-80">
                 @if ($animal->image_path)
                     <img
@@ -79,10 +79,10 @@ new #[Layout('layouts.app')] class extends Component
                     <x-fox-placeholder class="h-80" />
                 @endif
 
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
+                <div class="absolute inset-0 bg-linear-to-t from-black/60 via-black/10 to-transparent"></div>
                 <div class="absolute bottom-0 left-0 p-6 flex items-center gap-3">
-                    <h1 class="text-4xl font-bold text-white drop-shadow">{{ $animal->name }}</h1>
-                    <span class="text-xs font-medium text-amber-50 bg-amber-500/80 px-3 py-1 rounded-full capitalize backdrop-blur-sm">
+                    <h1 class="text-4xl font-bold text-white drop-shadow-sm">{{ $animal->name }}</h1>
+                    <span class="text-xs font-medium text-amber-50 bg-amber-500/80 px-3 py-1 rounded-full capitalize backdrop-blur-xs">
                         {{ $animal->species->value }}
                     </span>
                 </div>
@@ -93,7 +93,7 @@ new #[Layout('layouts.app')] class extends Component
         @if (count($stats))
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
                 @foreach ($stats as $stat)
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-3">
+                    <div class="bg-white rounded-2xl shadow-xs border border-gray-100 p-4 flex items-center gap-3">
                         <span class="shrink-0 w-9 h-9 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="{{ $stat['path'] }}"/>
@@ -113,13 +113,13 @@ new #[Layout('layouts.app')] class extends Component
 
             {{-- Left: about + fun facts --}}
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div class="bg-white rounded-2xl shadow-xs border border-gray-100 p-6">
                     <h3 class="font-semibold text-gray-800 mb-3">About {{ $animal->name }}</h3>
                     <p class="text-gray-600 leading-relaxed">{{ $animal->description }}</p>
                 </div>
 
                 @if (! empty($animal->fun_facts))
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="bg-white rounded-2xl shadow-xs border border-gray-100 p-6">
                         <h3 class="font-semibold text-gray-800 mb-4">Fun facts</h3>
                         <ul class="space-y-3">
                             @foreach ($animal->fun_facts as $fact)
@@ -140,7 +140,7 @@ new #[Layout('layouts.app')] class extends Component
             {{-- Right: personality + favourites --}}
             <div class="space-y-6">
                 @if (! empty($animal->personality))
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="bg-white rounded-2xl shadow-xs border border-gray-100 p-6">
                         <h3 class="font-semibold text-gray-800 mb-4">Personality</h3>
                         <div class="flex flex-wrap gap-2">
                             @foreach ($animal->personality as $trait)
@@ -153,7 +153,7 @@ new #[Layout('layouts.app')] class extends Component
                 @endif
 
                 @if ($animal->favourite_treat || $animal->favourite_spot)
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="bg-white rounded-2xl shadow-xs border border-gray-100 p-6">
                         <h3 class="font-semibold text-gray-800 mb-4">Favourites</h3>
                         <div class="space-y-4">
                             @if ($animal->favourite_treat)
