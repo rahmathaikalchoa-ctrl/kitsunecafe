@@ -87,11 +87,13 @@ new class extends Component
                         />
 
                         <flux:menu>
-                            <flux:menu.item href="{{ route('profile') }}" wire:navigate>
+                            <flux:menu.item href="{{ route('profile') }}" icon="user" wire:navigate
+                                class="transition-colors hover:bg-amber-50 hover:text-amber-700">
                                 {{ __('Profile') }}
                             </flux:menu.item>
                             <flux:menu.separator />
-                            <flux:menu.item wire:click="logout">
+                            <flux:menu.item wire:click="logout" icon="arrow-right-start-on-rectangle"
+                                class="transition-colors hover:bg-red-50 hover:text-red-600">
                                 {{ __('Log Out') }}
                             </flux:menu.item>
                         </flux:menu>

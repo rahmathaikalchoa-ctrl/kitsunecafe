@@ -60,6 +60,15 @@ test('navigation menu can be rendered', function () {
         ->assertSeeVolt('layout.navigation');
 });
 
+test('authenticated users visiting guest pages are redirected to the menu', function () {
+    // Guest-only pages bounce logged-in users; that redirect must match where login/register
+    // send customers (the menu), not the framework-default dashboard.
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->get('/login')->assertRedirect(route('menu.index'));
+    $this->actingAs($user)->get('/register')->assertRedirect(route('menu.index'));
+});
+
 test('users can logout', function () {
     $user = User::factory()->create();
 
