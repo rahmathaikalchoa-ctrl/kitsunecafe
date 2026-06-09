@@ -79,6 +79,7 @@ new class extends Component
                         <flux:button
                             variant="ghost"
                             size="sm"
+                            class="text-gray-600 hover:text-amber-600 hover:bg-amber-50 transition-colors duration-200"
                             x-data="{{ json_encode(['name' => auth()->user()->name]) }}"
                             x-text="name"
                             x-on:profile-updated.window="name = $event.detail.name"

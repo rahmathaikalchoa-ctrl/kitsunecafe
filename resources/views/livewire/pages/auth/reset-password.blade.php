@@ -14,8 +14,11 @@ new #[Layout('layouts.guest')] class extends Component
 {
     #[Locked]
     public string $token = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     public function mount(string $token): void
@@ -27,6 +30,10 @@ new #[Layout('layouts.guest')] class extends Component
 
     public function resetPassword(): void
     {
+        // Normalize the email so the reset matches the lowercased value stored at registration
+        // (the field is pre-filled from the link but the user can edit it).
+        $this->email = Str::lower($this->email);
+
         $this->validate([
             'token' => ['required'],
             'email' => ['required', 'string', 'email'],

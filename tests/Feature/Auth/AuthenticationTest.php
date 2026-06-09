@@ -22,6 +22,21 @@ test('users can authenticate using the login screen', function () {
     $this->assertAuthenticated();
 });
 
+test('users can authenticate with a differently-cased email', function () {
+    // Emails are stored lowercased at registration; logging in with a mixed-case version
+    // must still work (it failed on case-sensitive SQLite before the email was normalized).
+    $user = User::factory()->create(['email' => 'fox@example.com']);
+
+    Volt::test('pages.auth.login')
+        ->set('form.email', 'FOX@Example.com')
+        ->set('form.password', 'password')
+        ->call('login')
+        ->assertHasNoErrors()
+        ->assertRedirect(route('menu.index', absolute: false));
+
+    $this->assertAuthenticated();
+});
+
 test('users cannot authenticate with invalid password', function () {
     $user = User::factory()->create();
 

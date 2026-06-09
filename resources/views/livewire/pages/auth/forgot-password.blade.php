@@ -1,6 +1,10 @@
 <?php
 
+use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
@@ -10,9 +14,16 @@ new #[Layout('layouts.guest')] class extends Component
 
     public function sendPasswordResetLink(): void
     {
+        $this->ensureIsNotRateLimited();
+
+        // Normalize the email so the lookup matches the lowercased value stored at registration.
+        $this->email = Str::lower($this->email);
+
         $this->validate([
             'email' => ['required', 'string', 'email'],
         ]);
+
+        RateLimiter::hit($this->throttleKey(), 60);
 
         $status = Password::sendResetLink(
             $this->only('email')
@@ -27,6 +38,35 @@ new #[Layout('layouts.guest')] class extends Component
         $this->reset('email');
 
         session()->flash('status', __($status));
+    }
+
+    /**
+     * Block the form if this IP has requested too many reset links recently.
+     */
+    protected function ensureIsNotRateLimited(): void
+    {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+            return;
+        }
+
+        event(new Lockout(request()));
+
+        $seconds = RateLimiter::availableIn($this->throttleKey());
+
+        throw ValidationException::withMessages([
+            'email' => trans('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => ceil($seconds / 60),
+            ]),
+        ]);
+    }
+
+    /**
+     * Rate-limit key for password-reset requests: one bucket per client IP.
+     */
+    protected function throttleKey(): string
+    {
+        return Str::transliterate('password-reset:'.request()->ip());
     }
 }; ?>
 

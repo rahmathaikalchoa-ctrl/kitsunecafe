@@ -30,6 +30,10 @@ class LoginForm extends Form
      */
     public function authenticate(): void
     {
+        // Stored emails are lowercased at registration, so normalize the typed email before
+        // looking it up — otherwise a mixed-case login fails on case-sensitive databases (SQLite).
+        $this->email = Str::lower($this->email);
+
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
