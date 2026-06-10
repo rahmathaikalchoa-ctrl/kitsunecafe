@@ -16,7 +16,7 @@ test('registration normalizes a mixed-case email to lowercase', function () {
         ->set('password_confirmation', 'password')
         ->call('register')
         ->assertHasNoErrors()
-        ->assertRedirect(route('menu.index', absolute: false));
+        ->assertRedirect(route('dashboard', absolute: false));
 
     // The mixed-case input must be stored normalized as lowercase.
     $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
@@ -54,7 +54,7 @@ test('new users can register', function () {
         ->set('password', 'password')
         ->set('password_confirmation', 'password')
         ->call('register')
-        ->assertRedirect(route('menu.index', absolute: false));
+        ->assertRedirect(route('dashboard', absolute: false));
 
     $this->assertAuthenticated();
 });
