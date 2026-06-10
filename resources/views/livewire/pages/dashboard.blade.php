@@ -8,6 +8,7 @@ use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\CartService;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -61,47 +62,59 @@ new #[Layout('layouts.app')] class extends Component
     #[Computed]
     public function spotlightFox(): ?Animal
     {
-        $count = Animal::active()->count();
+        // Rarely-changing read (changes once per day) — cache it (CLAUDE.md §11).
+        return Cache::remember(
+            'dashboard:spotlight-fox:'.now()->toDateString(),
+            now()->endOfDay(),
+            function () {
+                $count = Animal::active()->count();
 
-        if ($count === 0) {
-            return null;
-        }
+                if ($count === 0) {
+                    return null;
+                }
 
-        // Day-of-year offset keeps the pick stable within a day but rotating.
-        $offset = (int) now()->dayOfYear % $count;
+                // Day-of-year offset keeps the pick stable within a day but rotating.
+                $offset = (int) now()->dayOfYear % $count;
 
-        return Animal::active()->orderBy('id')->skip($offset)->first();
+                return Animal::active()->orderBy('id')->skip($offset)->first();
+            }
+        );
     }
 
     // ── Computed: popular items (by quantity sold, newest as fallback) ────────
     #[Computed]
     public function popularItems()
     {
-        $rankedIds = OrderItem::query()
-            ->selectRaw('menu_item_id, SUM(quantity) as sold')
-            ->groupBy('menu_item_id')
-            ->orderByDesc('sold')
-            ->limit(8)
-            ->pluck('menu_item_id');
+        // Global, slow-changing read — cache with a short TTL (CLAUDE.md §11).
+        return Cache::remember('dashboard:popular-items', now()->addMinutes(10), function () {
+            // Cancelled orders shouldn't inflate popularity (matches ordersCount()).
+            $rankedIds = OrderItem::query()
+                ->whereHas('order', fn ($q) => $q->where('status', '!=', OrderStatus::Cancelled->value))
+                ->selectRaw('menu_item_id, SUM(quantity) as sold')
+                ->groupBy('menu_item_id')
+                ->orderByDesc('sold')
+                ->limit(8)
+                ->pluck('menu_item_id');
 
-        // No orders yet anywhere — show the freshest items instead.
-        if ($rankedIds->isEmpty()) {
+            // No qualifying orders yet — show the freshest items instead.
+            if ($rankedIds->isEmpty()) {
+                return MenuItem::available()
+                    ->with(['category', 'reviews'])
+                    ->latest()
+                    ->limit(4)
+                    ->get();
+            }
+
+            $order = $rankedIds->flip();
+
             return MenuItem::available()
                 ->with(['category', 'reviews'])
-                ->latest()
-                ->limit(4)
-                ->get();
-        }
-
-        $order = $rankedIds->flip();
-
-        return MenuItem::available()
-            ->with(['category', 'reviews'])
-            ->whereIn('id', $rankedIds)
-            ->get()
-            ->sortBy(fn ($item) => $order[$item->id] ?? PHP_INT_MAX)
-            ->take(4)
-            ->values();
+                ->whereIn('id', $rankedIds)
+                ->get()
+                ->sortBy(fn ($item) => $order[$item->id] ?? PHP_INT_MAX)
+                ->take(4)
+                ->values();
+        });
     }
 
     // ── Action: re-add the last order to the cart ────────────────────────────

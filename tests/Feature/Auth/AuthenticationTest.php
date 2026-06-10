@@ -17,7 +17,7 @@ test('users can authenticate using the login screen', function () {
         ->set('form.password', 'password')
         ->call('login')
         ->assertHasNoErrors()
-        ->assertRedirect(route('menu.index', absolute: false));
+        ->assertRedirect(route('dashboard', absolute: false));
 
     $this->assertAuthenticated();
 });
@@ -33,7 +33,7 @@ test('login normalizes a mixed-case, space-padded email', function () {
         ->set('form.password', 'password')
         ->call('login')
         ->assertHasNoErrors()
-        ->assertRedirect(route('menu.index', absolute: false));
+        ->assertRedirect(route('dashboard', absolute: false));
 
     $this->assertAuthenticated();
 });
