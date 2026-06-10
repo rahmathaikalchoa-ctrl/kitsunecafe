@@ -8,6 +8,7 @@ use App\Models\MenuItem;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\CartService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -15,16 +16,31 @@ use Livewire\Volt\Component;
 
 new #[Layout('layouts.app')] class extends Component
 {
+    // Timestamps are stored in UTC; convert to the cafe's local timezone for display only.
+    private function localNow(): Carbon
+    {
+        return now()->timezone(config('app.display_timezone'));
+    }
+
     // ── Computed: greeting ───────────────────────────────────────────────────
     #[Computed]
     public function greeting(): string
     {
+        $hour = $this->localNow()->hour;
+
         return match (true) {
-            now()->hour < 12 => 'Good morning',
-            now()->hour < 17 => 'Good afternoon',
-            now()->hour < 21 => 'Good evening',
+            $hour < 12 => 'Good morning',
+            $hour < 17 => 'Good afternoon',
+            $hour < 21 => 'Good evening',
             default => 'Still awake',
         };
+    }
+
+    // ── Computed: current local date (for the hero) ──────────────────────────
+    #[Computed]
+    public function currentDate(): string
+    {
+        return $this->localNow()->format('l, j F');
     }
 
     // ── Computed: personal stats ─────────────────────────────────────────────
@@ -62,11 +78,13 @@ new #[Layout('layouts.app')] class extends Component
     #[Computed]
     public function spotlightFox(): ?Animal
     {
-        // Rarely-changing read (changes once per day) — cache it (CLAUDE.md §11).
+        // Rarely-changing read (changes once per local day) — cache it (CLAUDE.md §11).
+        $local = $this->localNow();
+
         return Cache::remember(
-            'dashboard:spotlight-fox:'.now()->toDateString(),
-            now()->endOfDay(),
-            function () {
+            'dashboard:spotlight-fox:'.$local->toDateString(),
+            $local->copy()->endOfDay(),
+            function () use ($local) {
                 $count = Animal::active()->count();
 
                 if ($count === 0) {
@@ -74,7 +92,7 @@ new #[Layout('layouts.app')] class extends Component
                 }
 
                 // Day-of-year offset keeps the pick stable within a day but rotating.
-                $offset = (int) now()->dayOfYear % $count;
+                $offset = (int) $local->dayOfYear % $count;
 
                 return Animal::active()->orderBy('id')->skip($offset)->first();
             }
@@ -188,7 +206,7 @@ new #[Layout('layouts.app')] class extends Component
             </svg>
 
             <div class="relative max-w-xl">
-                <p class="text-sm font-medium text-white/80">{{ now()->format('l, j F') }}</p>
+                <p class="text-sm font-medium text-white/80">{{ $this->currentDate }}</p>
                 <h1 class="mt-1 text-2xl sm:text-3xl font-bold text-white">
                     {{ $this->greeting }}, {{ auth()->user()->name }}
                 </h1>

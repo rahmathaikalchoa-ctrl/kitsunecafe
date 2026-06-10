@@ -22,6 +22,16 @@ test('authenticated user can view the dashboard', function () {
     $this->actingAs($user)->get(route('dashboard'))->assertOk();
 });
 
+test('greeting uses the cafe local timezone', function () {
+    config(['app.display_timezone' => 'Asia/Jakarta']);
+    $this->travelTo('2026-06-11 02:00:00'); // 02:00 UTC = 09:00 WIB → morning
+
+    $user = User::factory()->create();
+    $this->actingAs($user)->get(route('dashboard'))->assertSee('Good morning');
+
+    $this->travelBack();
+});
+
 test('dashboard shows the latest order with its status', function () {
     $user = User::factory()->create();
     $item = MenuItem::factory()->create(['name' => 'Fox Ramen']);
