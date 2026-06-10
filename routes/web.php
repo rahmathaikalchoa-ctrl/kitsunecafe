@@ -12,7 +12,7 @@ Volt::route('/animals/{animal}', 'pages.animals.show')->name('animals.show');
 
 // Authenticated pages
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Volt::route('dashboard', 'pages.dashboard')->name('dashboard');
     Route::view('profile', 'profile')->name('profile');
     Volt::route('/cart', 'pages.cart.index')->name('cart.index');
     Volt::route('/checkout', 'pages.checkout.index')->name('checkout.index');
