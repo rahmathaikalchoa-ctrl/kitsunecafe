@@ -50,7 +50,7 @@ new #[Layout('layouts.guest')] class extends Component
             <div class="flex justify-between items-center">
                 <flux:label>{{ __('Password') }}</flux:label>
                 @if (Route::has('password.request'))
-                    <a class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline" href="{{ route('password.request') }}" wire:navigate>
+                    <a class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline" href="{{ route('password.request') }}">
                         {{ __('Forgot your password?') }}
                     </a>
                 @endif
@@ -87,7 +87,7 @@ new #[Layout('layouts.guest')] class extends Component
         @if (Route::has('register'))
             <p class="text-center text-sm text-gray-500">
                 {{ __('New to the cafe?') }}
-                <a href="{{ route('register') }}" wire:navigate class="font-medium text-amber-600 hover:text-amber-700 hover:underline">
+                <a href="{{ route('register') }}" class="font-medium text-amber-600 hover:text-amber-700 hover:underline">
                     {{ __('Create an account') }}
                 </a>
             </p>

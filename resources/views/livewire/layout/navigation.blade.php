@@ -98,14 +98,14 @@ new class extends Component
                     </flux:dropdown>
                 @else
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('login') }}" wire:navigate
+                        <a href="{{ route('login') }}"
                            class="text-sm font-medium text-gray-600 border border-gray-200 rounded-lg px-4 py-1.5
                                   hover:text-amber-600 hover:border-amber-300 hover:bg-amber-50
                                   transition-all duration-200
                                   dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-800">
                             Log in
                         </a>
-                        <a href="{{ route('register') }}" wire:navigate
+                        <a href="{{ route('register') }}"
                            class="text-sm font-semibold text-white rounded-lg px-4 py-1.5
                                   bg-linear-to-r from-amber-500 to-orange-400
                                   hover:from-amber-600 hover:to-orange-500
@@ -177,12 +177,12 @@ new class extends Component
             </div>
         @else
             <div class="pt-4 pb-3 border-t border-gray-200 px-4 flex gap-3">
-                <a href="{{ route('login') }}" wire:navigate
+                <a href="{{ route('login') }}"
                    class="flex-1 text-center text-sm font-medium text-gray-600 border border-gray-200 rounded-lg px-4 py-2
                           hover:text-amber-600 hover:border-amber-300 hover:bg-amber-50 transition-all duration-200">
                     Log in
                 </a>
-                <a href="{{ route('register') }}" wire:navigate
+                <a href="{{ route('register') }}"
                    class="flex-1 text-center text-sm font-semibold text-white rounded-lg px-4 py-2
                           bg-linear-to-r from-amber-500 to-orange-400
                           hover:from-amber-600 hover:to-orange-500 hover:shadow-lg hover:shadow-amber-300/50

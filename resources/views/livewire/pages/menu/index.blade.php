@@ -513,7 +513,7 @@ new #[Layout('layouts.app')] class extends Component
                                 @endif
                             @else
                                 <p class="text-sm text-gray-400">
-                                    <a href="{{ route('login') }}" wire:navigate class="text-amber-600 hover:underline">Log in</a>
+                                    <a href="{{ route('login') }}" class="text-amber-600 hover:underline">Log in</a>
                                     to leave a review.
                                 </p>
                             @endauth

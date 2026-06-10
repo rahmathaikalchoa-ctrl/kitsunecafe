@@ -18,12 +18,12 @@
                 Dashboard
             </a>
         @else
-            <a href="{{ route('login') }}" wire:navigate
+            <a href="{{ route('login') }}"
                class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
                 Log in
             </a>
             @if (Route::has('register'))
-                <a href="{{ route('register') }}" wire:navigate
+                <a href="{{ route('register') }}"
                    class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
                     Register
                 </a>
@@ -63,12 +63,12 @@
                     Dashboard
                 </a>
             @else
-                <a href="{{ route('login') }}" wire:navigate
+                <a href="{{ route('login') }}"
                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition">
                     Log in
                 </a>
                 @if (Route::has('register'))
-                    <a href="{{ route('register') }}" wire:navigate
+                    <a href="{{ route('register') }}"
                        class="block px-4 py-2 text-sm text-amber-600 font-medium hover:bg-amber-50 transition">
                         Register
                     </a>
