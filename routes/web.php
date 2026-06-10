@@ -3,7 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
-Route::view('/', 'welcome');
+// Guests see the landing page; logged-in users go straight to their dashboard.
+Route::get('/', function () {
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : view('welcome');
+})->name('home');
 
 // Public pages
 Volt::route('/menu', 'pages.menu.index')->name('menu.index');
