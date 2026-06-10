@@ -84,24 +84,24 @@ new #[Layout('layouts.app')] class extends Component
             ->limit(8)
             ->pluck('menu_item_id');
 
-        $items = MenuItem::available()
-            ->with(['category', 'reviews'])
-            ->when($rankedIds->isNotEmpty(), fn ($q) => $q->whereIn('id', $rankedIds))
-            ->get();
-
-        if ($rankedIds->isNotEmpty()) {
-            $order = $rankedIds->flip();
-            $items = $items->sortBy(fn ($item) => $order[$item->id] ?? PHP_INT_MAX)->values();
-        } else {
-            // No orders yet anywhere — show the freshest items instead.
-            $items = MenuItem::available()
+        // No orders yet anywhere — show the freshest items instead.
+        if ($rankedIds->isEmpty()) {
+            return MenuItem::available()
                 ->with(['category', 'reviews'])
                 ->latest()
                 ->limit(4)
                 ->get();
         }
 
-        return $items->take(4);
+        $order = $rankedIds->flip();
+
+        return MenuItem::available()
+            ->with(['category', 'reviews'])
+            ->whereIn('id', $rankedIds)
+            ->get()
+            ->sortBy(fn ($item) => $order[$item->id] ?? PHP_INT_MAX)
+            ->take(4)
+            ->values();
     }
 
     // ── Action: re-add the last order to the cart ────────────────────────────
@@ -124,7 +124,13 @@ new #[Layout('layouts.app')] class extends Component
 
         if ($added) {
             $this->redirectRoute('cart.index', navigate: true);
+
+            return;
         }
+
+        // Nothing could be re-added (every item is now unavailable) — tell the user
+        // instead of leaving the button to spin with no result.
+        $this->dispatch('cart-unavailable');
     }
 }; ?>
 
@@ -435,6 +441,23 @@ new #[Layout('layouts.app')] class extends Component
                 </div>
             </section>
         @endif
+
+        {{-- Unavailable-items toast (shown when "Order again" can re-add nothing) --}}
+        <div
+            x-data="{ show: false }"
+            x-on:cart-unavailable.window="show = true; setTimeout(() => show = false, 3500)"
+            x-show="show"
+            x-transition
+            class="fixed bottom-6 right-6 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg z-50 flex items-center gap-2"
+            role="status"
+            aria-live="polite"
+            style="display:none"
+        >
+            <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+            </svg>
+            Those items aren't available right now
+        </div>
 
     </div>
 </div>
