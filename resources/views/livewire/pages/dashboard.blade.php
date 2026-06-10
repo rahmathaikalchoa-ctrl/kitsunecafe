@@ -160,13 +160,18 @@ new #[Layout('layouts.app')] class extends Component
             {{-- Decorative blurred orbs --}}
             <div class="pointer-events-none absolute -top-10 -right-10 h-44 w-44 rounded-full bg-white/20 blur-2xl" aria-hidden="true"></div>
             <div class="pointer-events-none absolute -bottom-16 -left-8 h-52 w-52 rounded-full bg-orange-300/30 blur-3xl" aria-hidden="true"></div>
-            {{-- Oversized fox watermark --}}
-            <div class="pointer-events-none absolute right-4 sm:right-10 top-1/2 -translate-y-1/2 text-[8rem] sm:text-[11rem] leading-none opacity-20 select-none" aria-hidden="true">🦊</div>
+            {{-- Oversized fox-face watermark (matches the app's fox motif) --}}
+            <svg class="pointer-events-none absolute right-2 sm:right-8 top-1/2 -translate-y-1/2 h-44 w-44 sm:h-60 sm:w-60 text-white/15 select-none"
+                 viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+                <polygon points="28,72 6,14 52,52"/>
+                <polygon points="72,72 94,14 48,52"/>
+                <circle cx="50" cy="74" r="27"/>
+            </svg>
 
             <div class="relative max-w-xl">
                 <p class="text-sm font-medium text-white/80">{{ now()->format('l, j F') }}</p>
                 <h1 class="mt-1 text-2xl sm:text-3xl font-bold text-white">
-                    {{ $this->greeting }}, {{ auth()->user()->name }}! <span class="inline-block">🦊</span>
+                    {{ $this->greeting }}, {{ auth()->user()->name }}
                 </h1>
                 <p class="mt-2 text-white/90 leading-relaxed">
                     Warm drinks, handcrafted treats, and a den full of foxes are waiting for you.
@@ -178,13 +183,23 @@ new #[Layout('layouts.app')] class extends Component
                        class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-amber-700 shadow-sm
                               transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-900/10 active:translate-y-0
                               focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-amber-500">
-                        <span aria-hidden="true">🍜</span> Browse the menu
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>
+                        </svg>
+                        Browse the menu
                     </a>
                     <a href="{{ route('animals.index') }}" wire:navigate
                        class="inline-flex items-center gap-2 rounded-xl bg-white/15 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-inset ring-white/40
                               backdrop-blur-sm transition-all duration-200 hover:bg-white/25 hover:-translate-y-0.5 active:translate-y-0
                               focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-amber-500">
-                        <span aria-hidden="true">🐾</span> Meet the foxes
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <ellipse cx="5.5" cy="11" rx="1.7" ry="2.3"/>
+                            <ellipse cx="9.5" cy="7" rx="1.7" ry="2.4"/>
+                            <ellipse cx="14.5" cy="7" rx="1.7" ry="2.4"/>
+                            <ellipse cx="18.5" cy="11" rx="1.7" ry="2.3"/>
+                            <path d="M12 11.5c-2.9 0-5.2 2.2-5.2 4.8 0 1.7 1.3 2.7 2.8 2.7.9 0 1.5-.4 2.4-.4s1.5.4 2.4.4c1.5 0 2.8-1 2.8-2.7 0-2.6-2.3-4.8-5.2-4.8Z"/>
+                        </svg>
+                        Meet the foxes
                     </a>
                 </div>
             </div>
@@ -297,7 +312,11 @@ new #[Layout('layouts.app')] class extends Component
                 @else
                     {{-- Empty state: first visit --}}
                     <div class="flex flex-col items-center text-center py-8">
-                        <div class="text-5xl mb-3" aria-hidden="true">🍵</div>
+                        <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-500 mb-3">
+                            <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007Z"/>
+                            </svg>
+                        </div>
                         <p class="font-medium text-gray-700">No orders yet</p>
                         <p class="mt-1 text-sm text-gray-500 max-w-xs">Your first treat is just a few taps away. Browse the menu and find something you love.</p>
                         <a href="{{ route('menu.index') }}" wire:navigate
@@ -314,8 +333,10 @@ new #[Layout('layouts.app')] class extends Component
             {{-- Fox spotlight --}}
             <div class="rounded-2xl bg-white border border-gray-100 shadow-xs overflow-hidden flex flex-col">
                 <div class="flex items-center gap-2 px-5 pt-5 pb-3">
+                    <svg class="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"/>
+                    </svg>
                     <span class="text-xs font-semibold uppercase tracking-wide text-amber-600">Fox of the day</span>
-                    <span class="text-base" aria-hidden="true">✨</span>
                 </div>
 
                 @if ($this->spotlightFox)
@@ -352,7 +373,13 @@ new #[Layout('layouts.app')] class extends Component
                     </div>
                 @else
                     <div class="p-5 flex flex-col items-center text-center py-10 flex-1 justify-center">
-                        <div class="text-4xl mb-2" aria-hidden="true">🦊</div>
+                        <svg class="h-12 w-12 text-orange-200 mb-3" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+                            <polygon points="28,72 6,14 52,52"/>
+                            <polygon points="72,72 94,14 48,52"/>
+                            <circle cx="50" cy="74" r="27"/>
+                            <circle cx="38" cy="70" r="3.5" fill="white"/>
+                            <circle cx="62" cy="70" r="3.5" fill="white"/>
+                        </svg>
                         <p class="text-sm text-gray-500">Our foxes are napping. Check back soon!</p>
                     </div>
                 @endif
