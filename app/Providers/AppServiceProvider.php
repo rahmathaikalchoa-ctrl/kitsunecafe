@@ -23,8 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Already-authenticated users who hit a guest-only page (/login, /register, ...) should
-        // land on the menu — consistent with where login/register send customers — not the
-        // dashboard (the framework default when a `dashboard` route exists).
-        RedirectIfAuthenticated::redirectUsing(fn () => route('menu.index'));
+        // land on the dashboard — consistent with where login/register send customers.
+        RedirectIfAuthenticated::redirectUsing(fn () => route('dashboard'));
     }
 }
