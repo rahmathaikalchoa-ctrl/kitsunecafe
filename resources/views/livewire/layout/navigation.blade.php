@@ -41,7 +41,7 @@ new class extends Component
                 </div>
 
                 <div class="hidden sm:ms-10 sm:flex sm:items-center sm:gap-2">
-                    @foreach ([['menu.index', 'Menu'], ['animals.index', 'Our Foxes'], ['dashboard', 'Dashboard']] as [$routeName, $label])
+                    @foreach ([['menu.index', 'Menu'], ['animals.index', 'Our Foxes'], ['dashboard', 'Dashboard'], ['orders.index', 'Orders']] as [$routeName, $label])
                         <a href="{{ route($routeName) }}"
                            wire:navigate
                            @class([
@@ -139,7 +139,7 @@ new class extends Component
     {{-- Mobile menu --}}
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            @foreach ([['menu.index', 'Menu'], ['animals.index', 'Our Foxes'], ['dashboard', 'Dashboard'], ['cart.index', 'Cart']] as [$routeName, $label])
+            @foreach ([['menu.index', 'Menu'], ['animals.index', 'Our Foxes'], ['dashboard', 'Dashboard'], ['orders.index', 'Orders'], ['cart.index', 'Cart']] as [$routeName, $label])
                 <a href="{{ route($routeName) }}"
                    wire:navigate
                    @class([

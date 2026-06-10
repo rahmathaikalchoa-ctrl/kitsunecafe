@@ -62,13 +62,13 @@ new #[Layout('layouts.app')] class extends Component
                         @foreach ($this->cartItems as $line)
                             <li class="flex justify-between px-6 py-3 text-sm">
                                 <span class="text-gray-700">{{ $line->item->name }} × {{ $line->quantity }}</span>
-                                <span class="font-medium text-gray-900">Rp {{ number_format($line->subtotal_cents / 100, 0, ',', '.') }}</span>
+                                <span class="font-medium text-gray-900"><x-rupiah :amount="$line->subtotal_cents" /></span>
                             </li>
                         @endforeach
                     </ul>
                     <div class="flex justify-between px-6 py-4 bg-gray-50 border-t border-gray-100">
                         <span class="font-semibold text-gray-700">Total</span>
-                        <span class="font-bold text-gray-900">Rp {{ number_format($this->total / 100, 0, ',', '.') }}</span>
+                        <span class="font-bold text-gray-900"><x-rupiah :amount="$this->total" /></span>
                     </div>
                 </div>
 

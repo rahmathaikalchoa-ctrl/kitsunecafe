@@ -344,7 +344,7 @@ new #[Layout('layouts.app')] class extends Component
                                     </span>
                                 </div>
                                 <p class="mt-1 text-2xl font-bold text-amber-700">
-                                    Rp {{ number_format($item->price_cents, 0, ',', '.') }}
+                                    <x-rupiah :amount="$item->price_cents" />
                                 </p>
                                 @if ($item->description)
                                     <p class="mt-2 text-sm text-gray-600 leading-relaxed">{{ $item->description }}</p>

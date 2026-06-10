@@ -21,6 +21,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('profile', 'profile')->name('profile');
     Volt::route('/cart', 'pages.cart.index')->name('cart.index');
     Volt::route('/checkout', 'pages.checkout.index')->name('checkout.index');
+    Volt::route('/orders', 'pages.orders.index')->name('orders.index');
+    Volt::route('/orders/{order}', 'pages.orders.show')->name('orders.show');
 });
 
 require __DIR__.'/auth.php';

@@ -72,7 +72,7 @@ new #[Layout('layouts.app')] class extends Component
                             <tr wire:key="cart-{{ $line->item->id }}">
                                 <td class="px-6 py-4">
                                     <p class="font-medium text-gray-900">{{ $line->item->name }}</p>
-                                    <p class="text-gray-400 text-xs">Rp {{ number_format($line->item->price_cents, 0, ',', '.') }} each</p>
+                                    <p class="text-gray-400 text-xs"><x-rupiah :amount="$line->item->price_cents" /> each</p>
                                 </td>
                                 <td class="px-4 py-4">
                                     <div class="flex items-center justify-center gap-2">
@@ -84,7 +84,7 @@ new #[Layout('layouts.app')] class extends Component
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-right font-medium text-gray-800">
-                                    Rp {{ number_format($line->subtotal_cents, 0, ',', '.') }}
+                                    <x-rupiah :amount="$line->subtotal_cents" />
                                 </td>
                                 <td class="px-4 py-4">
                                     <button wire:click="remove({{ $line->item->id }})"
@@ -102,7 +102,7 @@ new #[Layout('layouts.app')] class extends Component
                         <tr>
                             <td colspan="2" class="px-6 py-4 font-semibold text-gray-700">Total</td>
                             <td class="px-6 py-4 text-right font-bold text-gray-900 text-base">
-                                Rp {{ number_format($this->total, 0, ',', '.') }}
+                                <x-rupiah :amount="$this->total" />
                             </td>
                             <td></td>
                         </tr>

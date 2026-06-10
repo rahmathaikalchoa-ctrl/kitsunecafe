@@ -133,3 +133,40 @@ test('popular items ignore cancelled orders', function () {
         ->assertSee('Valid Popular Dish')
         ->assertDontSee('Cancelled Only Dish');
 });
+
+test('favourites section shows for a user who has ordered', function () {
+    $user = User::factory()->create();
+    $item = MenuItem::factory()->create();
+
+    $order = Order::factory()->create([
+        'user_id' => $user->id,
+        'status' => OrderStatus::Completed->value,
+    ]);
+    OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'menu_item_id' => $item->id,
+        'quantity' => 3,
+        'price_cents' => $item->price_cents,
+    ]);
+
+    $this->actingAs($user)->get(route('dashboard'))->assertSee('Your favourites');
+});
+
+test('favourites section is hidden for a user with no orders', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->get(route('dashboard'))->assertDontSee('Your favourites');
+});
+
+test('addToCart adds an item and dispatches cart-updated', function () {
+    $user = User::factory()->create();
+    $item = MenuItem::factory()->create();
+
+    $this->actingAs($user);
+
+    Volt::test('pages.dashboard')
+        ->call('addToCart', $item->id)
+        ->assertDispatched('cart-updated');
+
+    expect(app(CartService::class)->count())->toBe(1);
+});

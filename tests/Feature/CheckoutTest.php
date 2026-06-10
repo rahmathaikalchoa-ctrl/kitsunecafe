@@ -16,6 +16,18 @@ test('authenticated user can view checkout', function () {
     $this->actingAs($user)->get(route('checkout.index'))->assertOk();
 });
 
+test('checkout shows prices at the correct scale (no divide-by-100)', function () {
+    $user = User::factory()->create();
+    $item = MenuItem::factory()->create(['price_cents' => 25000, 'name' => 'Hojicha Milk Tea']);
+
+    $this->actingAs($user);
+    session(['cart' => [$item->id => 1]]);
+
+    $this->get(route('checkout.index'))
+        ->assertSee('Rp 25.000')
+        ->assertDontSee('Rp 250');
+});
+
 test('user can place an order', function () {
     $user = User::factory()->create();
     $category = Category::factory()->create();

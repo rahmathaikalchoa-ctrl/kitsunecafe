@@ -49,7 +49,7 @@
                 <div class="flex flex-col items-end gap-0.5 shrink-0">
                     <span class="text-xs text-gray-400 uppercase tracking-wide">{{ $item->category->name }}</span>
                     <span class="text-sm font-semibold text-amber-700">
-                        Rp {{ number_format($item->price_cents, 0, ',', '.') }}
+                        <x-rupiah :amount="$item->price_cents" />
                     </span>
                 </div>
             </div>

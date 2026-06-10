@@ -135,6 +135,42 @@ new #[Layout('layouts.app')] class extends Component
         });
     }
 
+    // ── Computed: this user's favourite items (their most-ordered) ───────────
+    #[Computed]
+    public function favouriteItems()
+    {
+        $rankedIds = OrderItem::query()
+            ->whereHas('order', fn ($q) => $q
+                ->where('user_id', auth()->id())
+                ->where('status', '!=', OrderStatus::Cancelled->value))
+            ->selectRaw('menu_item_id, SUM(quantity) as qty')
+            ->groupBy('menu_item_id')
+            ->orderByDesc('qty')
+            ->limit(8)
+            ->pluck('menu_item_id');
+
+        if ($rankedIds->isEmpty()) {
+            return collect();
+        }
+
+        $order = $rankedIds->flip();
+
+        return MenuItem::available()
+            ->with(['category', 'reviews'])
+            ->whereIn('id', $rankedIds)
+            ->get()
+            ->sortBy(fn ($item) => $order[$item->id] ?? PHP_INT_MAX)
+            ->take(4)
+            ->values();
+    }
+
+    // ── Action: add a single item to the cart (favourites quick-add) ─────────
+    public function addToCart(int $menuItemId, CartService $cart): void
+    {
+        $cart->add($menuItemId);
+        $this->dispatch('cart-updated');
+    }
+
     // ── Action: re-add the last order to the cart ────────────────────────────
     public function orderAgain(CartService $cart): void
     {
@@ -168,15 +204,6 @@ new #[Layout('layouts.app')] class extends Component
 <x-slot name="header">
     <h2 class="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
 </x-slot>
-
-@php
-    $statusStyles = [
-        'pending'   => ['label' => 'Pending',   'dot' => 'bg-amber-400',   'chip' => 'bg-amber-50 text-amber-700 border-amber-100'],
-        'confirmed' => ['label' => 'Confirmed', 'dot' => 'bg-blue-400',    'chip' => 'bg-blue-50 text-blue-700 border-blue-100'],
-        'completed' => ['label' => 'Completed', 'dot' => 'bg-green-500',   'chip' => 'bg-green-50 text-green-700 border-green-100'],
-        'cancelled' => ['label' => 'Cancelled', 'dot' => 'bg-gray-400',    'chip' => 'bg-gray-100 text-gray-500 border-gray-200'],
-    ];
-@endphp
 
 <div class="py-8 sm:py-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -290,14 +317,14 @@ new #[Layout('layouts.app')] class extends Component
             {{-- Latest order (spans 2) --}}
             <div class="lg:col-span-2 rounded-2xl bg-white border border-gray-100 shadow-xs p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="font-semibold text-gray-900">Your latest order</h2>
-                    @if ($this->latestOrder)
-                        @php $s = $statusStyles[$this->latestOrder->status->value]; @endphp
-                        <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border {{ $s['chip'] }}">
-                            <span class="h-1.5 w-1.5 rounded-full {{ $s['dot'] }}"></span>
-                            {{ $s['label'] }}
-                        </span>
-                    @endif
+                    <div class="flex items-center gap-3">
+                        <h2 class="font-semibold text-gray-900">Your latest order</h2>
+                        @if ($this->latestOrder)
+                            <x-order-status-badge :status="$this->latestOrder->status" />
+                        @endif
+                    </div>
+                    <a href="{{ route('orders.index') }}" wire:navigate
+                       class="text-sm font-medium text-amber-600 hover:text-amber-700 hover:underline">View all orders →</a>
                 </div>
 
                 @if ($this->latestOrder)
@@ -319,14 +346,14 @@ new #[Layout('layouts.app')] class extends Component
                                     <span class="font-medium text-gray-500">{{ $line->quantity }}×</span>
                                     {{ $line->menuItem?->name ?? 'Removed item' }}
                                 </span>
-                                <span class="text-gray-500">Rp {{ number_format($line->price_cents * $line->quantity, 0, ',', '.') }}</span>
+                                <span class="text-gray-500"><x-rupiah :amount="$line->price_cents * $line->quantity" /></span>
                             </li>
                         @endforeach
                     </ul>
 
                     <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-4">
                         <p class="text-sm text-gray-500">
-                            Total <span class="ml-1 text-lg font-bold text-amber-700">Rp {{ number_format($order->total_cents, 0, ',', '.') }}</span>
+                            Total <span class="ml-1 text-lg font-bold text-amber-700"><x-rupiah :amount="$order->total_cents" /></span>
                         </p>
                         <button
                             wire:click="orderAgain"
@@ -423,6 +450,54 @@ new #[Layout('layouts.app')] class extends Component
             </div>
         </section>
 
+        {{-- ── Your favourites (this user's most-ordered) ──────────────────── --}}
+        @if ($this->favouriteItems->isNotEmpty())
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold text-gray-900">Your favourites</h2>
+                    <span class="text-sm text-gray-400">The things you order most</span>
+                </div>
+
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    @foreach ($this->favouriteItems as $item)
+                        <div wire:key="favourite-{{ $item->id }}"
+                             class="group flex flex-col rounded-2xl bg-white border border-gray-100 shadow-xs overflow-hidden
+                                    transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-amber-100/70 hover:border-amber-200">
+                            <div class="overflow-hidden">
+                                @if ($item->image_path)
+                                    <img src="{{ $item->imageUrl() }}" alt="{{ $item->name }}"
+                                         class="h-28 w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                         loading="lazy"
+                                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                                    <x-menu-category-placeholder :category="$item->category->name ?? ''" class="h-28" style="display:none" />
+                                @else
+                                    <x-menu-category-placeholder :category="$item->category->name ?? ''" class="h-28 transition-transform duration-500 group-hover:scale-110" />
+                                @endif
+                            </div>
+                            <div class="p-3 flex flex-col flex-1">
+                                <h3 class="text-sm font-semibold text-gray-900 leading-snug line-clamp-1">{{ $item->name }}</h3>
+                                <span class="mt-1 text-sm font-semibold text-amber-700"><x-rupiah :amount="$item->price_cents" /></span>
+                                <button
+                                    wire:click="addToCart({{ $item->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:loading.class="opacity-60 cursor-wait"
+                                    wire:target="addToCart({{ $item->id }})"
+                                    type="button"
+                                    class="mt-3 w-full bg-linear-to-r from-amber-500 to-orange-400
+                                           hover:from-amber-600 hover:to-orange-500 hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
+                                           active:translate-y-0 active:scale-[0.97] text-white text-xs font-semibold py-1.5 px-3 rounded-lg
+                                           transition-all duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
+                                           disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span wire:loading.remove wire:target="addToCart({{ $item->id }})">Add to cart</span>
+                                    <span wire:loading wire:target="addToCart({{ $item->id }})">Adding…</span>
+                                </button>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        @endif
+
         {{-- ── Popular items ────────────────────────────────────────────────── --}}
         @if ($this->popularItems->isNotEmpty())
             <section>
@@ -456,7 +531,7 @@ new #[Layout('layouts.app')] class extends Component
                             <div class="p-3">
                                 <h3 class="text-sm font-semibold text-gray-900 leading-snug line-clamp-1 group-hover:text-amber-700 transition-colors">{{ $item->name }}</h3>
                                 <div class="mt-1 flex items-center justify-between">
-                                    <span class="text-sm font-semibold text-amber-700">Rp {{ number_format($item->price_cents, 0, ',', '.') }}</span>
+                                    <span class="text-sm font-semibold text-amber-700"><x-rupiah :amount="$item->price_cents" /></span>
                                     @if ($reviewCount > 0)
                                         <span class="inline-flex items-center gap-0.5 text-xs text-gray-400">
                                             <svg viewBox="0 0 20 20" class="w-3.5 h-3.5 fill-current text-amber-400" aria-hidden="true">
@@ -488,6 +563,23 @@ new #[Layout('layouts.app')] class extends Component
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
             </svg>
             Those items aren't available right now
+        </div>
+
+        {{-- Added-to-cart toast (favourites quick-add) --}}
+        <div
+            x-data="{ show: false }"
+            x-on:cart-updated.window="show = true; setTimeout(() => show = false, 3000)"
+            x-show="show"
+            x-transition
+            class="fixed bottom-6 right-6 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg z-50 flex items-center gap-2"
+            role="status"
+            aria-live="polite"
+            style="display:none"
+        >
+            <svg class="w-4 h-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+            </svg>
+            Added to cart
         </div>
 
     </div>
