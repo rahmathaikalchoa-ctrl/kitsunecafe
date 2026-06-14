@@ -100,7 +100,7 @@ new #[Layout('layouts.app')] class extends Component
                                   focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400">
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <span class="font-mono font-medium text-gray-700">#{{ $order->id }}</span>
+                                    <span class="font-mono font-medium text-gray-700">{{ $order->reference }}</span>
                                     <x-order-status-badge :status="$order->status" />
                                     <x-order-type-badge :type="$order->order_type" :table="$order->table_number" />
                                 </div>

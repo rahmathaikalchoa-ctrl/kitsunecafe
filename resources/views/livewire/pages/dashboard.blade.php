@@ -330,7 +330,7 @@ new #[Layout('layouts.app')] class extends Component
                     @php $order = $this->latestOrder; @endphp
 
                     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm text-gray-500">
-                        <span class="font-mono font-medium text-gray-700">#{{ $order->id }}</span>
+                        <span class="font-mono font-medium text-gray-700">{{ $order->reference }}</span>
                         <span aria-hidden="true">·</span>
                         <span>{{ $order->created_at->diffForHumans() }}</span>
                         <span aria-hidden="true">·</span>

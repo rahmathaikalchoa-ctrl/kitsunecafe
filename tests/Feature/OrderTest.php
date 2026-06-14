@@ -49,7 +49,7 @@ test('a user can view their own order detail', function () {
     $this->actingAs($me)->get(route('orders.show', $order))
         ->assertOk()
         ->assertSee('Kitsune Curry Rice')
-        ->assertSee('#'.$order->id);
+        ->assertSee($order->reference);
 });
 
 test('a user can cancel their own pending order', function () {

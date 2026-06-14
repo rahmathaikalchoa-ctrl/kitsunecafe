@@ -49,7 +49,7 @@ test('dashboard shows the latest order with its status', function () {
     ]);
 
     $this->actingAs($user)->get(route('dashboard'))
-        ->assertSee('#'.$order->id)
+        ->assertSee($order->reference)
         ->assertSee('Confirmed')
         ->assertSee('Fox Ramen');
 });

@@ -54,7 +54,7 @@ new #[Layout('layouts.app')] class extends Component
 }; ?>
 
 <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">Order #{{ $order->id }}</h2>
+    <h2 class="font-semibold text-xl text-gray-800 leading-tight">Order {{ $order->reference }}</h2>
 </x-slot>
 
 <div class="py-8 sm:py-10">
@@ -71,7 +71,7 @@ new #[Layout('layouts.app')] class extends Component
         <div class="rounded-2xl bg-white border border-gray-100 shadow-xs p-6">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div class="flex flex-wrap items-center gap-2">
-                    <span class="font-mono font-semibold text-gray-800">#{{ $order->id }}</span>
+                    <span class="font-mono font-semibold text-gray-800">{{ $order->reference }}</span>
                     <x-order-status-badge :status="$order->status" />
                     <x-order-type-badge :type="$order->order_type" :table="$order->table_number" />
                 </div>

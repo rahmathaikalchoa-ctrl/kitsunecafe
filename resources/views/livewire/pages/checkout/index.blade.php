@@ -56,7 +56,7 @@ new #[Layout('layouts.app')] class extends Component
             $this->notes ?: null,
         );
 
-        session()->flash('order_placed', "Order #{$order->id} placed successfully!");
+        session()->flash('order_placed', "Order {$order->reference} placed successfully!");
 
         $this->redirect(route('dashboard'), navigate: true);
     }
