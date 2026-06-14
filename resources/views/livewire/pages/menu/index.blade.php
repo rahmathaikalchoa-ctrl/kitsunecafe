@@ -11,9 +11,12 @@ use App\Services\CartService;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Livewire\WithPagination;
 
 new #[Layout('layouts.app')] class extends Component
 {
+    use WithPagination;
+
     // ── Filter state ─────────────────────────────────────────────────────────
     public ?int $categoryId = null;
 
@@ -31,7 +34,11 @@ new #[Layout('layouts.app')] class extends Component
     #[Computed]
     public function categories()
     {
-        return Category::orderBy('name')->get();
+        // Only show categories that actually have at least one available item, so a filter button
+        // can never land the user on an empty grid.
+        return Category::whereHas('menuItems', fn ($q) => $q->available())
+            ->orderBy('name')
+            ->get();
     }
 
     #[Computed]
@@ -41,7 +48,14 @@ new #[Layout('layouts.app')] class extends Component
             ->with(['category', 'reviews'])
             ->when($this->categoryId, fn ($q) => $q->where('category_id', $this->categoryId))
             ->orderBy('name')
-            ->get();
+            ->paginate(12);
+    }
+
+    // Reset to page 1 whenever the category filter changes, so an active page that no longer exists
+    // in the filtered set doesn't show an empty grid.
+    public function updatedCategoryId(): void
+    {
+        $this->resetPage();
     }
 
     #[Computed]
@@ -231,6 +245,10 @@ new #[Layout('layouts.app')] class extends Component
                 @foreach ($this->menuItems as $item)
                     <x-menu-item-card :item="$item" wire:key="menu-item-{{ $item->id }}" />
                 @endforeach
+            </div>
+
+            <div class="mt-8">
+                {{ $this->menuItems->links() }}
             </div>
         @endif
 

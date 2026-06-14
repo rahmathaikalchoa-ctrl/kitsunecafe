@@ -6,9 +6,12 @@ use App\Models\Animal;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use Livewire\WithPagination;
 
 new #[Layout('layouts.app')] class extends Component
 {
+    use WithPagination;
+
     public ?int $selectedAnimalId = null;
 
     public ?string $color = null;
@@ -19,7 +22,13 @@ new #[Layout('layouts.app')] class extends Component
         return Animal::active()
             ->when($this->color, fn ($q) => $q->where('color', $this->color))
             ->orderBy('name')
-            ->get();
+            ->paginate(12);
+    }
+
+    // Reset to page 1 whenever the colour filter changes.
+    public function updatedColor(): void
+    {
+        $this->resetPage();
     }
 
     #[Computed]
@@ -121,11 +130,15 @@ new #[Layout('layouts.app')] class extends Component
                 @endif
             </div>
         @else
-            <p class="text-sm text-gray-400 mb-4">Showing {{ $this->animals->count() }} of {{ $this->totalFoxes }} {{ Str::plural('fox', $this->totalFoxes) }}</p>
+            <p class="text-sm text-gray-400 mb-4">Showing {{ $this->animals->count() }} of {{ $this->animals->total() }} {{ Str::plural('fox', $this->animals->total()) }}</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($this->animals as $animal)
                     <x-animal-card :animal="$animal" wire:key="animal-{{ $animal->id }}" />
                 @endforeach
+            </div>
+
+            <div class="mt-8">
+                {{ $this->animals->links() }}
             </div>
         @endif
 
