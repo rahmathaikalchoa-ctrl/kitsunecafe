@@ -82,6 +82,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Dine-in Table Count
+    |--------------------------------------------------------------------------
+    |
+    | The number of physical tables in the cafe. Dine-in orders let the guest
+    | pick a table from 1 to this number, so staff know where to bring the food.
+    |
+    */
+
+    'tables_count' => (int) env('APP_TABLES_COUNT', 12),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |

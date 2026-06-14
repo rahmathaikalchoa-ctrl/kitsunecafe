@@ -315,10 +315,11 @@ new #[Layout('layouts.app')] class extends Component
             {{-- Latest order (spans 2) --}}
             <div class="lg:col-span-2 rounded-2xl bg-white border border-gray-100 shadow-xs p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-3">
+                    <div class="flex flex-wrap items-center gap-2">
                         <h2 class="font-semibold text-gray-900">Your latest order</h2>
                         @if ($this->latestOrder)
                             <x-order-status-badge :status="$this->latestOrder->status" />
+                            <x-order-type-badge :type="$this->latestOrder->order_type" :table="$this->latestOrder->table_number" />
                         @endif
                     </div>
                     <a href="{{ route('orders.index') }}" wire:navigate

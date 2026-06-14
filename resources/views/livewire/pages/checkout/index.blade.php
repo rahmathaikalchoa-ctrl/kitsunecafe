@@ -1,13 +1,19 @@
 <?php
 
+use App\Enums\OrderType;
 use App\Services\CartService;
 use App\Services\OrderService;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
 new #[Layout('layouts.app')] class extends Component
 {
+    public string $orderType = 'dine_in';
+
+    public ?int $tableNumber = null;
+
     public string $notes = '';
 
     #[Computed]
@@ -22,11 +28,33 @@ new #[Layout('layouts.app')] class extends Component
         return app(CartService::class)->totalCents();
     }
 
+    #[Computed]
+    public function tablesCount(): int
+    {
+        return (int) config('app.tables_count');
+    }
+
     public function placeOrder(OrderService $orderService): void
     {
-        $this->validate(['notes' => ['nullable', 'string', 'max:500']]);
+        $dineIn = $this->orderType === OrderType::DineIn->value;
 
-        $order = $orderService->placeOrder(auth()->user(), $this->notes ?: null);
+        $this->validate([
+            'orderType' => ['required', Rule::enum(OrderType::class)],
+            'tableNumber' => [
+                $dineIn ? 'required' : 'nullable',
+                'integer', 'min:1', 'max:'.$this->tablesCount,
+            ],
+            'notes' => ['nullable', 'string', 'max:500'],
+        ], [
+            'tableNumber.required' => 'Please choose your table.',
+        ]);
+
+        $order = $orderService->placeOrder(
+            auth()->user(),
+            OrderType::from($this->orderType),
+            $this->tableNumber,
+            $this->notes ?: null,
+        );
 
         session()->flash('order_placed', "Order #{$order->id} placed successfully!");
 
@@ -71,6 +99,25 @@ new #[Layout('layouts.app')] class extends Component
                         <span class="font-bold text-gray-900"><x-rupiah :amount="$this->total" /></span>
                     </div>
                 </div>
+
+                {{-- Dine-in or takeaway --}}
+                <flux:radio.group wire:model.live="orderType" label="Order type" variant="segmented">
+                    <flux:radio value="dine_in" label="Dine-in" />
+                    <flux:radio value="takeaway" label="Takeaway" />
+                </flux:radio.group>
+
+                {{-- Table (dine-in only) --}}
+                @if ($orderType === 'dine_in')
+                    <flux:field>
+                        <flux:label>Table</flux:label>
+                        <flux:select wire:model="tableNumber" placeholder="Choose your table…">
+                            @for ($i = 1; $i <= $this->tablesCount; $i++)
+                                <flux:select.option value="{{ $i }}">Table {{ $i }}</flux:select.option>
+                            @endfor
+                        </flux:select>
+                        <flux:error name="tableNumber" />
+                    </flux:field>
+                @endif
 
                 {{-- Notes --}}
                 <flux:field>

@@ -99,9 +99,10 @@ new #[Layout('layouts.app')] class extends Component
                                   transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-amber-100/70 hover:border-amber-200
                                   focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400">
                             <div class="min-w-0">
-                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                <div class="flex flex-wrap items-center gap-2">
                                     <span class="font-mono font-medium text-gray-700">#{{ $order->id }}</span>
                                     <x-order-status-badge :status="$order->status" />
+                                    <x-order-type-badge :type="$order->order_type" :table="$order->table_number" />
                                 </div>
                                 <p class="mt-1 text-sm text-gray-500">
                                     {{ $order->created_at->timezone(config('app.display_timezone'))->format('d M Y, H:i') }}
