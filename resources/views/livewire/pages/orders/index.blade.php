@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Enums\OrderStatus;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -10,13 +12,24 @@ new #[Layout('layouts.app')] class extends Component
 {
     use WithPagination;
 
+    #[Url]
+    public ?string $status = null;
+
+    public function updatedStatus(): void
+    {
+        $this->resetPage();
+    }
+
     public function with(): array
     {
         return [
             'orders' => auth()->user()->orders()
+                ->when($this->status, fn ($q) => $q->where('status', $this->status))
                 ->withSum('orderItems', 'quantity')
                 ->latest()
                 ->paginate(10),
+            'hasOrders' => auth()->user()->orders()->exists(),
+            'statuses' => OrderStatus::cases(),
         ];
     }
 }; ?>
@@ -28,7 +41,7 @@ new #[Layout('layouts.app')] class extends Component
 <div class="py-8 sm:py-10">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        @if ($orders->isEmpty())
+        @if (! $hasOrders)
             <div class="flex flex-col items-center text-center py-16 rounded-2xl bg-white border border-gray-100 shadow-xs">
                 <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-500 mb-3">
                     <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
@@ -46,6 +59,38 @@ new #[Layout('layouts.app')] class extends Component
                 </a>
             </div>
         @else
+            {{-- Status filter --}}
+            <div class="flex flex-wrap gap-2 mb-6">
+                <button
+                    wire:click="$set('status', null)"
+                    aria-pressed="{{ $status === null ? 'true' : 'false' }}"
+                    @class([
+                        'px-4 py-1.5 rounded-full text-sm font-medium transition',
+                        'bg-amber-500 text-white' => $status === null,
+                        'bg-white text-gray-600 border border-gray-200 hover:border-amber-300' => $status !== null,
+                    ])>
+                    All
+                </button>
+                @foreach ($statuses as $case)
+                    <button
+                        wire:click="$set('status', '{{ $case->value }}')"
+                        aria-pressed="{{ $status === $case->value ? 'true' : 'false' }}"
+                        @class([
+                            'px-4 py-1.5 rounded-full text-sm font-medium transition',
+                            'bg-amber-500 text-white' => $status === $case->value,
+                            'bg-white text-gray-600 border border-gray-200 hover:border-amber-300' => $status !== $case->value,
+                        ])>
+                        {{ $case->label() }}
+                    </button>
+                @endforeach
+            </div>
+
+            @if ($orders->isEmpty())
+                <div class="text-center py-16 text-gray-400">
+                    <p class="text-lg">No {{ $status }} orders.</p>
+                    <button wire:click="$set('status', null)" class="mt-3 text-sm font-medium text-amber-600 hover:underline">Show all orders</button>
+                </div>
+            @else
             <ul class="space-y-3">
                 @foreach ($orders as $order)
                     <li wire:key="order-{{ $order->id }}">
@@ -77,6 +122,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="mt-6">
                 {{ $orders->links() }}
             </div>
+            @endif
         @endif
     </div>
 </div>

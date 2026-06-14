@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Services\CartService;
 use Livewire\Attributes\Layout;
@@ -22,22 +23,33 @@ new #[Layout('layouts.app')] class extends Component
     // Re-add this order's still-available items to the cart.
     public function orderAgain(CartService $cart): void
     {
-        $added = false;
+        $result = $cart->addFromOrder($this->order);
 
-        foreach ($this->order->orderItems as $line) {
-            if ($line->menuItem?->is_available) {
-                $cart->add($line->menu_item_id, $line->quantity);
-                $added = true;
-            }
-        }
-
-        if ($added) {
-            $this->redirectRoute('cart.index', navigate: true);
+        if ($result['added'] === 0) {
+            $this->dispatch('cart-unavailable');
 
             return;
         }
 
-        $this->dispatch('cart-unavailable');
+        // Some items were dropped — let the cart page explain why after we navigate.
+        if ($result['skipped'] > 0) {
+            session()->flash('reorder_skipped', $result['skipped']);
+        }
+
+        $this->redirectRoute('cart.index', navigate: true);
+    }
+
+    // Let the customer cancel their own order while it is still pending.
+    public function cancel(): void
+    {
+        abort_unless($this->order->user_id === auth()->id(), 403);
+
+        if (! $this->order->status->isCancellable()) {
+            return;
+        }
+
+        $this->order->update(['status' => OrderStatus::Cancelled]);
+        $this->order->refresh();
     }
 }; ?>
 
@@ -91,23 +103,41 @@ new #[Layout('layouts.app')] class extends Component
                 <p class="text-sm text-gray-500">
                     Total <span class="ml-1 text-lg font-bold text-amber-700"><x-rupiah :amount="$order->total_cents" /></span>
                 </p>
-                <button
-                    wire:click="orderAgain"
-                    wire:loading.attr="disabled"
-                    wire:loading.class="opacity-60 cursor-wait"
-                    wire:target="orderAgain"
-                    type="button"
-                    class="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-amber-500 to-orange-400
-                           hover:from-amber-600 hover:to-orange-500 hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
-                           active:translate-y-0 active:scale-[0.97] text-white text-sm font-semibold py-2 px-4
-                           transition-all duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
-                           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>
-                    </svg>
-                    <span wire:loading.remove wire:target="orderAgain">Order again</span>
-                    <span wire:loading wire:target="orderAgain">Adding…</span>
-                </button>
+                <div class="flex items-center gap-2">
+                    @if ($order->status->isCancellable())
+                        <button
+                            wire:click="cancel"
+                            wire:confirm="Cancel this order? This can't be undone."
+                            wire:loading.attr="disabled"
+                            wire:target="cancel"
+                            type="button"
+                            class="inline-flex items-center gap-2 rounded-lg border border-gray-200 text-gray-600 text-sm font-semibold py-2 px-4
+                                   hover:border-red-300 hover:text-red-600 transition-colors duration-200
+                                   focus:outline-hidden focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:ring-offset-1
+                                   disabled:opacity-50 disabled:cursor-wait">
+                            <span wire:loading.remove wire:target="cancel">Cancel order</span>
+                            <span wire:loading wire:target="cancel">Cancelling…</span>
+                        </button>
+                    @endif
+
+                    <button
+                        wire:click="orderAgain"
+                        wire:loading.attr="disabled"
+                        wire:loading.class="opacity-60 cursor-wait"
+                        wire:target="orderAgain"
+                        type="button"
+                        class="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-amber-500 to-orange-400
+                               hover:from-amber-600 hover:to-orange-500 hover:shadow-lg hover:shadow-amber-300/50 hover:-translate-y-0.5
+                               active:translate-y-0 active:scale-[0.97] text-white text-sm font-semibold py-2 px-4
+                               transition-all duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-1
+                               disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none">
+                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                        </svg>
+                        <span wire:loading.remove wire:target="orderAgain">Order again</span>
+                        <span wire:loading wire:target="orderAgain">Adding…</span>
+                    </button>
+                </div>
             </div>
         </div>
 

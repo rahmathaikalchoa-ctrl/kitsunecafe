@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class OrderService
@@ -31,20 +32,26 @@ class OrderService
             ]);
         }
 
-        $order = Order::create([
-            'user_id' => $user->id,
-            'status' => OrderStatus::Pending,
-            'notes' => $notes,
-            'total_cents' => $this->cart->totalCents(),
-        ]);
-
-        foreach ($items as $line) {
-            $order->orderItems()->create([
-                'menu_item_id' => $line->item->id,
-                'quantity' => $line->quantity,
-                'price_cents' => $line->item->price_cents,
+        // Create the order and its line items atomically — a failure mid-loop must not leave an
+        // orphaned order with a total but no items.
+        $order = DB::transaction(function () use ($user, $notes, $items): Order {
+            $order = Order::create([
+                'user_id' => $user->id,
+                'status' => OrderStatus::Pending,
+                'notes' => $notes,
+                'total_cents' => $this->cart->totalCents(),
             ]);
-        }
+
+            foreach ($items as $line) {
+                $order->orderItems()->create([
+                    'menu_item_id' => $line->item->id,
+                    'quantity' => $line->quantity,
+                    'price_cents' => $line->item->price_cents,
+                ]);
+            }
+
+            return $order;
+        });
 
         $this->cart->clear();
 

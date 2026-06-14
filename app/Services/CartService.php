@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\MenuItem;
+use App\Models\Order;
 use Illuminate\Support\Collection;
 
 class CartService
@@ -16,6 +17,28 @@ class CartService
         $cart = $this->raw();
         $cart[$menuItemId] = ($cart[$menuItemId] ?? 0) + $qty;
         session([self::SESSION_KEY => $cart]);
+    }
+
+    /**
+     * Re-add an order's still-available line items to the cart.
+     *
+     * @return array{added: int, skipped: int} counts of items added vs. skipped (no longer available)
+     */
+    public function addFromOrder(Order $order): array
+    {
+        $added = 0;
+        $skipped = 0;
+
+        foreach ($order->orderItems as $line) {
+            if ($line->menuItem?->is_available) {
+                $this->add($line->menu_item_id, $line->quantity);
+                $added++;
+            } else {
+                $skipped++;
+            }
+        }
+
+        return ['added' => $added, 'skipped' => $skipped];
     }
 
     public function remove(int $menuItemId): void
@@ -94,4 +117,4 @@ class CartService
     }
 }
 
-#
+//

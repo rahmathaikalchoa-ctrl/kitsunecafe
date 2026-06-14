@@ -180,24 +180,22 @@ new #[Layout('layouts.app')] class extends Component
             return;
         }
 
-        $added = false;
+        $result = $cart->addFromOrder($order);
 
-        foreach ($order->orderItems as $line) {
-            if ($line->menuItem?->is_available) {
-                $cart->add($line->menu_item_id, $line->quantity);
-                $added = true;
-            }
-        }
-
-        if ($added) {
-            $this->redirectRoute('cart.index', navigate: true);
+        // Nothing could be re-added (every item is now unavailable) — tell the user
+        // instead of leaving the button to spin with no result.
+        if ($result['added'] === 0) {
+            $this->dispatch('cart-unavailable');
 
             return;
         }
 
-        // Nothing could be re-added (every item is now unavailable) — tell the user
-        // instead of leaving the button to spin with no result.
-        $this->dispatch('cart-unavailable');
+        // Some items were dropped — let the cart page explain why after we navigate.
+        if ($result['skipped'] > 0) {
+            session()->flash('reorder_skipped', $result['skipped']);
+        }
+
+        $this->redirectRoute('cart.index', navigate: true);
     }
 }; ?>
 

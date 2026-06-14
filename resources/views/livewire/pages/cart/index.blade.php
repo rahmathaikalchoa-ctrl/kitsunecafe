@@ -41,6 +41,16 @@ new #[Layout('layouts.app')] class extends Component
 <div class="py-10">
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
+        @if (session('reorder_skipped'))
+            @php $skipped = (int) session('reorder_skipped'); @endphp
+            <div class="mb-6 flex items-start gap-3 rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm text-amber-800" role="status">
+                <svg class="h-5 w-5 shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+                </svg>
+                <span>{{ $skipped }} {{ Str::plural('item', $skipped) }} from that order {{ $skipped === 1 ? "isn't" : "aren't" }} available right now and {{ $skipped === 1 ? 'was' : 'were' }} left out.</span>
+            </div>
+        @endif
+
         @if ($this->cartItems->isEmpty())
             <div class="text-center py-20 text-gray-400">
                 <div class="flex justify-center mb-4">
