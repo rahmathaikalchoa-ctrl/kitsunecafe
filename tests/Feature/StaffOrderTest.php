@@ -75,7 +75,7 @@ test('staff can reject an order from the staff list', function () {
 
     $this->actingAs($staff);
 
-    Volt::test('pages.staff.orders')
+    Volt::test('pages.admin.orders')
         ->call('reject', $order->id);
 
     expect($order->fresh()->status)->toBe(OrderStatus::Cancelled);
@@ -95,13 +95,13 @@ test('an invalid status transition is a no-op', function () {
 });
 
 test('guest is redirected to login from the staff orders list', function () {
-    $this->get(route('staff.orders'))->assertRedirect(route('login'));
+    $this->get(route('admin.orders'))->assertRedirect(route('login'));
 });
 
 test('a non-staff user cannot view the staff orders list', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->get(route('staff.orders'))->assertForbidden();
+    $this->actingAs($user)->get(route('admin.orders'))->assertForbidden();
 });
 
 test('staff can view and advance orders from the staff list', function () {
@@ -110,7 +110,7 @@ test('staff can view and advance orders from the staff list', function () {
 
     $this->actingAs($staff);
 
-    Volt::test('pages.staff.orders')
+    Volt::test('pages.admin.orders')
         ->assertSee($order->reference)
         ->call('confirm', $order->id);
 

@@ -23,9 +23,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('/checkout', 'pages.checkout.index')->name('checkout.index');
     Volt::route('/orders', 'pages.orders.index')->name('orders.index');
     Volt::route('/orders/{order}', 'pages.orders.show')->name('orders.show');
+});
 
-    // Staff-only order management (gated inside the component via the OrderPolicy).
-    Volt::route('/staff/orders', 'pages.staff.orders')->name('staff.orders');
+// Staff-only admin panel.
+Route::middleware(['auth', 'verified', 'staff'])->prefix('admin')->name('admin.')->group(function () {
+    Volt::route('/', 'pages.admin.dashboard')->name('dashboard');
+    Volt::route('/orders', 'pages.admin.orders')->name('orders');
+    Volt::route('/menu', 'pages.admin.menu')->name('menu');
+    Volt::route('/categories', 'pages.admin.categories')->name('categories');
+    Volt::route('/animals', 'pages.admin.animals')->name('animals');
 });
 
 require __DIR__.'/auth.php';

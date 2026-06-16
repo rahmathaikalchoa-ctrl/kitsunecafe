@@ -9,7 +9,7 @@ use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
-new #[Layout('layouts.app')] class extends Component
+new #[Layout('layouts.admin')] class extends Component
 {
     use WithPagination;
 
@@ -77,8 +77,8 @@ new #[Layout('layouts.app')] class extends Component
     <h2 class="font-semibold text-xl text-gray-800 leading-tight">Manage Orders</h2>
 </x-slot>
 
-<div class="py-8 sm:py-10">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl">
 
         {{-- Status filter --}}
         <div class="flex flex-wrap gap-2 mb-6">
@@ -113,7 +113,7 @@ new #[Layout('layouts.app')] class extends Component
         @else
             <ul class="space-y-3">
                 @foreach ($orders as $order)
-                    <li wire:key="staff-order-{{ $order->id }}"
+                    <li wire:key="admin-order-{{ $order->id }}"
                         class="rounded-2xl bg-white border border-gray-100 shadow-xs p-5">
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div class="min-w-0">

@@ -86,14 +86,14 @@ new class extends Component
                         </a>
 
                         @if (auth()->user()?->is_staff)
-                            <a href="{{ route('staff.orders') }}"
+                            <a href="{{ route('admin.dashboard') }}"
                                wire:navigate
                                @class([
                                    'text-sm font-medium rounded-lg px-3 py-1.5 transition-all duration-200',
-                                   'bg-amber-100 text-amber-700' => request()->routeIs('staff.orders'),
-                                   'text-gray-600 hover:text-amber-600 hover:bg-amber-50 hover:-translate-y-0.5' => ! request()->routeIs('staff.orders'),
+                                   'bg-amber-100 text-amber-700' => request()->routeIs('admin.*'),
+                                   'text-gray-600 hover:text-amber-600 hover:bg-amber-50 hover:-translate-y-0.5' => ! request()->routeIs('admin.*'),
                                ])>
-                                Manage Orders
+                                Admin
                             </a>
                         @endif
                     @endauth
@@ -194,14 +194,14 @@ new class extends Component
                 @endforeach
 
                 @if (auth()->user()?->is_staff)
-                    <a href="{{ route('staff.orders') }}"
+                    <a href="{{ route('admin.dashboard') }}"
                        wire:navigate
                        @class([
                            'block w-full ps-3 pe-4 py-2 border-l-4 text-start text-sm font-medium transition duration-150 ease-in-out',
-                           'border-amber-400 text-amber-700 bg-amber-50' => request()->routeIs('staff.orders'),
-                           'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' => ! request()->routeIs('staff.orders'),
+                           'border-amber-400 text-amber-700 bg-amber-50' => request()->routeIs('admin.*'),
+                           'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' => ! request()->routeIs('admin.*'),
                        ])>
-                        Manage Orders
+                        Admin
                     </a>
                 @endif
             @endauth
