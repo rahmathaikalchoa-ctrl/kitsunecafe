@@ -85,7 +85,7 @@ new #[Layout('layouts.admin')] class extends Component
                         }
                     });
                 })
-                ->with('user')
+                ->with(['user', 'orderItems.menuItem'])
                 ->withSum('orderItems', 'quantity')
                 ->latest()
                 ->paginate(15),
@@ -144,6 +144,7 @@ new #[Layout('layouts.admin')] class extends Component
             <ul class="space-y-3">
                 @foreach ($orders as $order)
                     <li wire:key="admin-order-{{ $order->id }}"
+                        x-data="{ open: false }"
                         class="rounded-2xl bg-white border border-gray-100 shadow-xs p-5 transition hover:border-amber-200 hover:shadow-md">
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div class="min-w-0">
@@ -160,6 +161,37 @@ new #[Layout('layouts.admin')] class extends Component
                                 </p>
                             </div>
                             <span class="text-base font-bold text-amber-700 shrink-0"><x-rupiah :amount="$order->total_cents" /></span>
+                        </div>
+
+                        {{-- Details: line items + the customer's special requests --}}
+                        <div class="mt-2">
+                            <button type="button" x-on:click="open = ! open"
+                                    class="inline-flex items-center gap-1 text-xs font-medium text-amber-600 hover:underline">
+                                <span x-text="open ? 'Hide details' : 'View details'">View details</span>
+                                <svg class="h-3.5 w-3.5 transition-transform" :class="open && 'rotate-180'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </button>
+
+                            <div x-show="open" x-transition style="display:none" class="mt-3 rounded-xl bg-gray-50 border border-gray-100 p-4">
+                                <ul class="divide-y divide-gray-100 text-sm">
+                                    @foreach ($order->orderItems as $line)
+                                        <li class="flex items-center justify-between py-1.5">
+                                            <span class="text-gray-700"><span class="text-gray-400">{{ $line->quantity }}×</span> {{ $line->menuItem?->name ?? 'Removed item' }}</span>
+                                            <span class="text-gray-500"><x-rupiah :amount="$line->price_cents * $line->quantity" /></span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+
+                                @if ($order->notes)
+                                    <div class="mt-3 border-t border-gray-100 pt-3">
+                                        <p class="text-xs font-medium uppercase tracking-wide text-gray-400 mb-1">Special requests</p>
+                                        <p class="text-sm text-gray-600">{{ $order->notes }}</p>
+                                    </div>
+                                @else
+                                    <p class="mt-3 border-t border-gray-100 pt-3 text-sm text-gray-400">No special requests.</p>
+                                @endif
+                            </div>
                         </div>
 
                         @php

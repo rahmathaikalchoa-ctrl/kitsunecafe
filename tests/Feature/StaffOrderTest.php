@@ -9,6 +9,24 @@ use App\Models\Review;
 use App\Models\User;
 use Livewire\Volt\Volt;
 
+test('admin orders list shows each order note and items', function () {
+    $staff = User::factory()->staff()->create();
+    $item = MenuItem::factory()->create(['name' => 'Fox Ramen']);
+    $order = Order::factory()->create(['notes' => 'No onions please']);
+    OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'menu_item_id' => $item->id,
+        'quantity' => 1,
+        'price_cents' => $item->price_cents,
+    ]);
+
+    $this->actingAs($staff);
+
+    Volt::test('pages.admin.orders')
+        ->assertSee('No onions please')
+        ->assertSee('Fox Ramen');
+});
+
 test('admin order search matches the order reference', function () {
     $staff = User::factory()->staff()->create();
     $mine = Order::factory()->create();

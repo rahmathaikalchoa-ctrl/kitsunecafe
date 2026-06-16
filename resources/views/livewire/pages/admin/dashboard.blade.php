@@ -71,7 +71,7 @@ new #[Layout('layouts.admin')] class extends Component
         </svg>
         <div class="relative">
             <p class="text-amber-50/90 text-sm font-medium">Admin · Kitsune Animal Cafe</p>
-            <h1 class="mt-1 text-2xl sm:text-3xl font-bold text-white">Welcome back, {{ $firstName }} 🦊</h1>
+            <h1 class="mt-1 text-2xl sm:text-3xl font-bold text-white">Welcome back, {{ $firstName }}</h1>
             <p class="mt-2 text-amber-50/90 text-sm max-w-lg">
                 @if ($this->pendingOrders > 0)
                     You have <span class="font-semibold text-white">{{ $this->pendingOrders }}</span> {{ Str::plural('order', $this->pendingOrders) }} waiting to be confirmed.
