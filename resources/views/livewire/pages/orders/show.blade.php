@@ -14,7 +14,8 @@ new #[Layout('layouts.app')] class extends Component
 
     public function mount(Order $order): void
     {
-        abort_unless($order->user_id === auth()->id(), 403);
+        // Customers may view their own orders; staff may view any order (OrderPolicy).
+        abort_unless(auth()->user()->can('view', $order), 403);
 
         $order->load('orderItems.menuItem');
         $this->order = $order;
@@ -49,6 +50,29 @@ new #[Layout('layouts.app')] class extends Component
         }
 
         $this->order->update(['status' => OrderStatus::Cancelled]);
+        $this->order->refresh();
+    }
+
+    // ── Staff actions: advance the order through its lifecycle ────────────────
+    public function confirm(): void
+    {
+        $this->transition(OrderStatus::Confirmed);
+    }
+
+    public function complete(): void
+    {
+        $this->transition(OrderStatus::Completed);
+    }
+
+    private function transition(OrderStatus $to): void
+    {
+        abort_unless(auth()->user()->can('manage', $this->order), 403);
+
+        if (! $this->order->status->canTransitionTo($to)) {
+            return;
+        }
+
+        $this->order->update(['status' => $to]);
         $this->order->refresh();
     }
 }; ?>
@@ -140,6 +164,33 @@ new #[Layout('layouts.app')] class extends Component
                     </button>
                 </div>
             </div>
+
+            {{-- Staff controls: advance the order through its lifecycle --}}
+            @can('manage', $order)
+                <div class="mt-4 rounded-xl border border-amber-100 bg-amber-50/60 p-4">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-3">Staff controls</p>
+                    @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Confirmed) || $order->status->canTransitionTo(\App\Enums\OrderStatus::Completed))
+                        <div class="flex flex-wrap items-center gap-2">
+                            @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Confirmed))
+                                <button wire:click="confirm" wire:loading.attr="disabled" wire:target="confirm" type="button"
+                                        class="inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 transition-colors disabled:opacity-50 disabled:cursor-wait">
+                                    <span wire:loading.remove wire:target="confirm">Confirm order</span>
+                                    <span wire:loading wire:target="confirm">Confirming…</span>
+                                </button>
+                            @endif
+                            @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Completed))
+                                <button wire:click="complete" wire:loading.attr="disabled" wire:target="complete" type="button"
+                                        class="inline-flex items-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 px-4 transition-colors disabled:opacity-50 disabled:cursor-wait">
+                                    <span wire:loading.remove wire:target="complete">Mark completed</span>
+                                    <span wire:loading wire:target="complete">Completing…</span>
+                                </button>
+                            @endif
+                        </div>
+                    @else
+                        <p class="text-sm text-amber-700/80">This order is {{ $order->status->label() }} — no further action.</p>
+                    @endif
+                </div>
+            @endcan
         </div>
 
         {{-- Unavailable-items toast --}}

@@ -44,4 +44,18 @@ enum OrderStatus: string
     {
         return $this === self::Pending;
     }
+
+    /**
+     * Whether an order may move from this status to $next. Forward flow is staff-driven
+     * (Pending → Confirmed → Completed); cancellation is allowed until an order is completed.
+     * Completed and Cancelled are terminal.
+     */
+    public function canTransitionTo(self $next): bool
+    {
+        return match ($this) {
+            self::Pending => in_array($next, [self::Confirmed, self::Cancelled], true),
+            self::Confirmed => in_array($next, [self::Completed, self::Cancelled], true),
+            self::Completed, self::Cancelled => false,
+        };
+    }
 }

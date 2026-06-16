@@ -23,6 +23,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Volt::route('/checkout', 'pages.checkout.index')->name('checkout.index');
     Volt::route('/orders', 'pages.orders.index')->name('orders.index');
     Volt::route('/orders/{order}', 'pages.orders.show')->name('orders.show');
+
+    // Staff-only order management (gated inside the component via the OrderPolicy).
+    Volt::route('/staff/orders', 'pages.staff.orders')->name('staff.orders');
 });
 
 require __DIR__.'/auth.php';
