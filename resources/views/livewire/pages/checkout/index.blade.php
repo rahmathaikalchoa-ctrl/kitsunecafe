@@ -136,8 +136,10 @@ new #[Layout('layouts.app')] class extends Component
                     </div>
                 @enderror
 
-                <flux:button type="submit" variant="primary" class="w-full">
-                    Place Order
+                <flux:button type="submit" variant="primary" class="w-full"
+                    wire:loading.attr="disabled" wire:target="placeOrder">
+                    <span wire:loading.remove wire:target="placeOrder">Place Order</span>
+                    <span wire:loading wire:target="placeOrder">Placing order…</span>
                 </flux:button>
 
                 <p class="text-center text-sm text-gray-400">
