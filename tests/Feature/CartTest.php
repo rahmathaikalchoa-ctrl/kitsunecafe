@@ -4,6 +4,7 @@ use App\Models\Category;
 use App\Models\MenuItem;
 use App\Models\User;
 use App\Services\CartService;
+use Livewire\Volt\Volt;
 
 test('guest is redirected to login when accessing cart', function () {
     $this->get(route('cart.index'))->assertRedirect(route('login'));
@@ -84,7 +85,36 @@ test('cart flags an unavailable item and warns', function () {
     $this->get(route('cart.index'))
         ->assertOk()
         ->assertSee('Unavailable')
-        ->assertSee('no longer available');
+        ->assertSee('no longer available')
+        ->assertSee('Increase quantity of'); // aria-label on the steppers
+});
+
+test('editing the cart dispatches cart-updated to refresh the nav badge', function () {
+    $user = User::factory()->create();
+    $item = MenuItem::factory()->create();
+
+    $this->actingAs($user);
+    session(['cart' => [$item->id => 2]]);
+
+    Volt::test('pages.cart.index')
+        ->call('remove', $item->id)
+        ->assertDispatched('cart-updated');
+});
+
+test('the cart total excludes unavailable items', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $available = MenuItem::factory()->create(['category_id' => $category->id, 'price_cents' => 1000]);
+    $gone = MenuItem::factory()->unavailable()->create(['category_id' => $category->id, 'price_cents' => 2000]);
+
+    $this->actingAs($user);
+    session(['cart' => [$available->id => 1, $gone->id => 1]]);
+
+    // Total reflects only the available item (Rp 1.000), not the combined Rp 3.000.
+    $this->get(route('cart.index'))
+        ->assertOk()
+        ->assertSee('Rp 1.000')
+        ->assertDontSee('Rp 3.000');
 });
 
 test('cart total is computed from line items', function () {

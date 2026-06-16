@@ -16,7 +16,10 @@ new #[Layout('layouts.app')] class extends Component
     #[Computed]
     public function total(): int
     {
-        return app(CartService::class)->totalCents();
+        // Only available lines count toward what the customer can actually check out with.
+        return (int) $this->cartItems
+            ->filter(fn ($line) => $line->item->is_available)
+            ->sum('subtotal_cents');
     }
 
     /** True when any line is no longer available — blocks checkout until it's removed. */
@@ -47,6 +50,9 @@ new #[Layout('layouts.app')] class extends Component
     private function refreshTotals(): void
     {
         unset($this->cartItems, $this->total, $this->hasUnavailable);
+
+        // Keep the navbar cart-count badge in sync with edits made on this page.
+        $this->dispatch('cart-updated');
     }
 }; ?>
 
@@ -109,10 +115,12 @@ new #[Layout('layouts.app')] class extends Component
                                     <div class="flex items-center justify-center gap-2">
                                         <button wire:click="decrement({{ $line->item->id }})"
                                                 @disabled(! $line->item->is_available)
+                                                aria-label="Decrease quantity of {{ $line->item->name }}"
                                                 class="w-7 h-7 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-amber-400 hover:text-amber-600 transition text-base disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-500">−</button>
                                         <span class="w-6 text-center font-medium text-gray-800">{{ $line->quantity }}</span>
                                         <button wire:click="increment({{ $line->item->id }})"
                                                 @disabled(! $line->item->is_available)
+                                                aria-label="Increase quantity of {{ $line->item->name }}"
                                                 class="w-7 h-7 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-amber-400 hover:text-amber-600 transition text-base disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-500">+</button>
                                     </div>
                                 </td>
