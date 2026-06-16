@@ -16,6 +16,9 @@ new #[Layout('layouts.admin')] class extends Component
     #[Url]
     public ?string $status = null;
 
+    #[Url]
+    public string $search = '';
+
     public function mount(): void
     {
         abort_unless(auth()->user()->can('viewAny', Order::class), 403);
@@ -27,6 +30,11 @@ new #[Layout('layouts.admin')] class extends Component
     }
 
     public function updatedStatus(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSearch(): void
     {
         $this->resetPage();
     }
@@ -64,6 +72,19 @@ new #[Layout('layouts.admin')] class extends Component
         return [
             'orders' => Order::query()
                 ->when($this->status, fn ($q) => $q->where('status', $this->status))
+                ->when(trim($this->search), function ($q, $term) {
+                    // "ORD-0007", "0007", "7" → order id; otherwise match the customer.
+                    $idTerm = ltrim(preg_replace('/\D/', '', $term), '0');
+
+                    $q->where(function ($q) use ($term, $idTerm) {
+                        $q->whereHas('user', fn ($u) => $u->where('name', 'like', "%{$term}%")
+                            ->orWhere('email', 'like', "%{$term}%"));
+
+                        if ($idTerm !== '') {
+                            $q->orWhere('id', (int) $idTerm);
+                        }
+                    });
+                })
                 ->with('user')
                 ->withSum('orderItems', 'quantity')
                 ->latest()
@@ -79,6 +100,15 @@ new #[Layout('layouts.admin')] class extends Component
 
 <div class="py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl">
+
+        {{-- Search --}}
+        <div class="mb-4">
+            <flux:field>
+                <flux:label class="sr-only">Search orders</flux:label>
+                <flux:input wire:model.live.debounce.300ms="search" type="search"
+                    placeholder="Search by order # or customer…" icon="magnifying-glass" clearable />
+            </flux:field>
+        </div>
 
         {{-- Status filter --}}
         <div class="flex flex-wrap gap-2 mb-6">
@@ -108,7 +138,7 @@ new #[Layout('layouts.admin')] class extends Component
 
         @if ($orders->isEmpty())
             <div class="text-center py-16 text-gray-400">
-                <p class="text-lg">@if ($status) No {{ $status }} orders. @else No orders yet. @endif</p>
+                <p class="text-lg">@if ($search) No orders match “{{ $search }}”. @elseif ($status) No {{ $status }} orders. @else No orders yet. @endif</p>
             </div>
         @else
             <ul class="space-y-3">

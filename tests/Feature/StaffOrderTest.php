@@ -9,6 +9,34 @@ use App\Models\Review;
 use App\Models\User;
 use Livewire\Volt\Volt;
 
+test('admin order search matches the order reference', function () {
+    $staff = User::factory()->staff()->create();
+    $mine = Order::factory()->create();
+    $other = Order::factory()->create();
+
+    $this->actingAs($staff);
+
+    Volt::test('pages.admin.orders')
+        ->set('search', $mine->reference)
+        ->assertSee(route('orders.show', $mine))
+        ->assertDontSee(route('orders.show', $other));
+});
+
+test('admin order search matches the customer name', function () {
+    $staff = User::factory()->staff()->create();
+    $alice = User::factory()->create(['name' => 'Alice Wonderland']);
+    $bob = User::factory()->create(['name' => 'Bob Builder']);
+    $aliceOrder = Order::factory()->create(['user_id' => $alice->id]);
+    $bobOrder = Order::factory()->create(['user_id' => $bob->id]);
+
+    $this->actingAs($staff);
+
+    Volt::test('pages.admin.orders')
+        ->set('search', 'Alice')
+        ->assertSee(route('orders.show', $aliceOrder))
+        ->assertDontSee(route('orders.show', $bobOrder));
+});
+
 test('staff can confirm a pending order', function () {
     $staff = User::factory()->staff()->create();
     $order = Order::factory()->create(['status' => OrderStatus::Pending->value]);
