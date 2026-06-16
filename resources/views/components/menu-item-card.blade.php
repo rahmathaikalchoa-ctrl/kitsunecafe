@@ -1,4 +1,4 @@
-@props(['item' => \App\Models\MenuItem::class])
+@props(['item'])
 
 @php
     $avg = round($item->reviews->avg('rating') ?? 0, 1);

@@ -16,7 +16,7 @@ function makeOrderedItem(User $user, ?MenuItem $item = null): MenuItem
 
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => OrderStatus::Pending,
+        'status' => OrderStatus::Completed,
         'total_cents' => $item->price_cents,
     ]);
 
@@ -58,7 +58,7 @@ test('user without an order cannot submit a review', function () {
     expect(Review::where('user_id', $user->id)->exists())->toBeFalse();
 });
 
-test('user with a non-cancelled order can submit a review', function () {
+test('user with a completed order can submit a review', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
@@ -72,6 +72,35 @@ test('user with a non-cancelled order can submit a review', function () {
         ->assertHasNoErrors();
 
     expect(Review::where('user_id', $user->id)->where('menu_item_id', $item->id)->exists())->toBeTrue();
+});
+
+test('a pending order is not enough to review an item', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $category = Category::factory()->create();
+    $item = MenuItem::factory()->create(['category_id' => $category->id]);
+
+    $order = Order::factory()->create([
+        'user_id' => $user->id,
+        'status' => OrderStatus::Pending,
+        'total_cents' => $item->price_cents,
+    ]);
+    OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'menu_item_id' => $item->id,
+        'quantity' => 1,
+        'price_cents' => $item->price_cents,
+    ]);
+
+    Volt::test('pages.menu.index')
+        ->call('openItem', $item->id)
+        ->set('reviewRating', 5)
+        ->set('reviewComment', 'Too soon!')
+        ->call('submitReview')
+        ->assertHasNoErrors();
+
+    expect(Review::where('user_id', $user->id)->where('menu_item_id', $item->id)->exists())->toBeFalse();
 });
 
 test('review is saved with correct rating and comment', function () {

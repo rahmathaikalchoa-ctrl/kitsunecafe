@@ -94,9 +94,11 @@ new #[Layout('layouts.app')] class extends Component
             return false;
         }
 
+        // Only a completed order counts — a pending/confirmed order means the item hasn't been
+        // served yet, so there's nothing to review.
         return OrderItem::whereHas('order', fn ($q) => $q
             ->where('user_id', auth()->id())
-            ->whereNotIn('status', [OrderStatus::Cancelled->value])
+            ->where('status', OrderStatus::Completed->value)
         )->where('menu_item_id', $this->selectedItemId)->exists();
     }
 
@@ -527,7 +529,7 @@ new #[Layout('layouts.app')] class extends Component
                                         </form>
                                     @endif
                                 @else
-                                    <p class="text-sm text-gray-400">Order this item to leave a review.</p>
+                                    <p class="text-sm text-gray-400">You can leave a review once your order is completed.</p>
                                 @endif
                             @else
                                 <p class="text-sm text-gray-400">
