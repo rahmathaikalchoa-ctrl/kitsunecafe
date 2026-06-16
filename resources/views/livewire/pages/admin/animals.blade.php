@@ -162,17 +162,17 @@ new #[Layout('layouts.admin')] class extends Component
         @else
             <div class="bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden">
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 border-b border-gray-100 text-left text-gray-500">
+                    <thead class="bg-gray-50 border-b border-gray-100 text-left text-xs uppercase tracking-wide text-gray-500">
                         <tr>
-                            <th class="px-5 py-3 font-medium">Name</th>
-                            <th class="px-4 py-3 font-medium">Colour</th>
-                            <th class="px-4 py-3 font-medium">Status</th>
+                            <th class="px-5 py-3 font-semibold">Name</th>
+                            <th class="px-4 py-3 font-semibold">Colour</th>
+                            <th class="px-4 py-3 font-semibold">Status</th>
                             <th class="px-4 py-3"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         @foreach ($animals as $animal)
-                            <tr wire:key="animal-{{ $animal->id }}">
+                            <tr wire:key="animal-{{ $animal->id }}" class="hover:bg-amber-50/40 transition-colors">
                                 <td class="px-5 py-3 font-medium text-gray-900">{{ $animal->name }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $animal->color ?? '—' }}</td>
                                 <td class="px-4 py-3">

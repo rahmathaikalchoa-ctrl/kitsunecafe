@@ -15,10 +15,10 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen flex bg-gray-100">
+        <div class="min-h-screen flex bg-gray-50">
             {{-- Sidebar --}}
-            <aside class="w-60 shrink-0 bg-white border-r border-gray-100">
-                <div class="sticky top-0 h-screen">
+            <aside class="w-64 shrink-0 bg-white border-r border-gray-100">
+                <div class="sticky top-0 h-screen overflow-y-auto">
                     <livewire:admin.sidebar />
                 </div>
             </aside>

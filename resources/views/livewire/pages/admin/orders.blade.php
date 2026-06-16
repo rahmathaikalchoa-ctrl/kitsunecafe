@@ -114,7 +114,7 @@ new #[Layout('layouts.admin')] class extends Component
             <ul class="space-y-3">
                 @foreach ($orders as $order)
                     <li wire:key="admin-order-{{ $order->id }}"
-                        class="rounded-2xl bg-white border border-gray-100 shadow-xs p-5">
+                        class="rounded-2xl bg-white border border-gray-100 shadow-xs p-5 transition hover:border-amber-200 hover:shadow-md">
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">

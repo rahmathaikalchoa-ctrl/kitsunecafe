@@ -88,7 +88,7 @@ new #[Layout('layouts.admin')] class extends Component
             <div class="bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden">
                 <ul class="divide-y divide-gray-50">
                     @foreach ($categories as $category)
-                        <li wire:key="category-{{ $category->id }}" class="flex items-center justify-between gap-4 px-5 py-3">
+                        <li wire:key="category-{{ $category->id }}" class="flex items-center justify-between gap-4 px-5 py-3 hover:bg-amber-50/40 transition-colors">
                             <div>
                                 <p class="font-medium text-gray-900">{{ $category->name }}</p>
                                 <p class="text-xs text-gray-400">{{ $category->menu_items_count }} {{ Str::plural('item', $category->menu_items_count) }}</p>

@@ -130,18 +130,18 @@ new #[Layout('layouts.admin')] class extends Component
         @else
             <div class="bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden">
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 border-b border-gray-100 text-left text-gray-500">
+                    <thead class="bg-gray-50 border-b border-gray-100 text-left text-xs uppercase tracking-wide text-gray-500">
                         <tr>
-                            <th class="px-5 py-3 font-medium">Item</th>
-                            <th class="px-4 py-3 font-medium">Category</th>
-                            <th class="px-4 py-3 font-medium text-right">Price</th>
-                            <th class="px-4 py-3 font-medium">Status</th>
+                            <th class="px-5 py-3 font-semibold">Item</th>
+                            <th class="px-4 py-3 font-semibold">Category</th>
+                            <th class="px-4 py-3 font-semibold text-right">Price</th>
+                            <th class="px-4 py-3 font-semibold">Status</th>
                             <th class="px-4 py-3"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         @foreach ($items as $item)
-                            <tr wire:key="menu-{{ $item->id }}">
+                            <tr wire:key="menu-{{ $item->id }}" class="hover:bg-amber-50/40 transition-colors">
                                 <td class="px-5 py-3 font-medium text-gray-900">{{ $item->name }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $item->category?->name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-right text-gray-700"><x-rupiah :amount="$item->price_cents" /></td>
