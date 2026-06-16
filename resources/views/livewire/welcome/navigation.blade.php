@@ -2,29 +2,29 @@
     {{-- Desktop nav links --}}
     <nav class="hidden sm:flex items-center gap-1 -mx-3">
         <a href="{{ route('menu.index') }}" wire:navigate
-           class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
+           class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600">
             Menu
         </a>
         <a href="{{ route('animals.index') }}" wire:navigate
-           class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
+           class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600">
             Our Foxes
         </a>
 
-        <span class="mx-1 text-gray-300 dark:text-gray-600">|</span>
+        <span class="mx-1 text-gray-300">|</span>
 
         @auth
             <a href="{{ url('/dashboard') }}" wire:navigate
-               class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
+               class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600">
                 Dashboard
             </a>
         @else
             <a href="{{ route('login') }}"
-               class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
+               class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600">
                 Log in
             </a>
             @if (Route::has('register'))
                 <a href="{{ route('register') }}"
-                   class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600 dark:text-white dark:hover:text-amber-400">
+                   class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 transition hover:text-amber-600">
                     Register
                 </a>
             @endif
