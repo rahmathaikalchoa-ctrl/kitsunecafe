@@ -60,6 +60,26 @@ test('navigation menu can be rendered', function () {
         ->assertSeeVolt('layout.navigation');
 });
 
+test('guest navigation hides auth-only links', function () {
+    // The nav renders on the public menu page; a logged-out visitor should not see links to
+    // pages that would only bounce them to login.
+    $this->get('/menu')
+        ->assertOk()
+        ->assertDontSee(route('dashboard'))
+        ->assertDontSee(route('orders.index'))
+        ->assertDontSee(route('cart.index'))
+        ->assertSee(route('login'));
+});
+
+test('authenticated navigation shows orders and cart links', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->get('/menu')
+        ->assertOk()
+        ->assertSee(route('orders.index'))
+        ->assertSee(route('cart.index'));
+});
+
 test('authenticated users visiting guest pages are redirected to the dashboard', function () {
     // Guest-only pages bounce logged-in users; that redirect must match where login/register
     // send customers (the dashboard).

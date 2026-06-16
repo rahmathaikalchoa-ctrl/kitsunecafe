@@ -25,50 +25,66 @@ new class extends Component
 
 <nav x-data="{ open: false }"
      x-on:cart-updated.window="$wire.$refresh()"
-     class="bg-white border-b border-gray-100 dark:bg-zinc-900 dark:border-zinc-800">
+     class="bg-white border-b border-gray-100">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
 
             {{-- Logo + desktop nav links --}}
             <div class="flex items-center">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2 group">
+                    <a href="{{ auth()->check() ? route('dashboard') : route('home') }}" wire:navigate class="flex items-center gap-2 group">
                         <x-application-logo class="block h-9 w-9 text-amber-500 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6" />
-                        <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white leading-none">
+                        <span class="font-bold text-lg tracking-tight text-gray-900 leading-none">
                             Kitsune<span class="text-amber-500"> Cafe</span>
                         </span>
                     </a>
                 </div>
 
                 <div class="hidden sm:ms-10 sm:flex sm:items-center sm:gap-2">
-                    @foreach ([['menu.index', 'Menu'], ['animals.index', 'Our Foxes'], ['dashboard', 'Dashboard'], ['orders.index', 'Orders']] as [$routeName, $label])
+                    {{-- Public links --}}
+                    @foreach ([['menu.index', 'Menu'], ['animals.index', 'Our Foxes']] as [$routeName, $label])
                         <a href="{{ route($routeName) }}"
                            wire:navigate
                            @class([
                                'text-sm font-medium rounded-lg px-3 py-1.5 transition-all duration-200',
-                               'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400' => request()->routeIs($routeName),
-                               'text-gray-600 hover:text-amber-600 hover:bg-amber-50 hover:-translate-y-0.5 dark:text-zinc-300 dark:hover:bg-zinc-800' => ! request()->routeIs($routeName),
+                               'bg-amber-100 text-amber-700' => request()->routeIs($routeName),
+                               'text-gray-600 hover:text-amber-600 hover:bg-amber-50 hover:-translate-y-0.5' => ! request()->routeIs($routeName),
                            ])>
                             {{ $label }}
                         </a>
                     @endforeach
 
-                    <a href="{{ route('cart.index') }}" wire:navigate
-                       aria-label="Cart"
-                       @class([
-                           'relative flex items-center rounded-lg p-1.5 transition-all duration-200',
-                           'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400' => request()->routeIs('cart.index'),
-                           'text-gray-600 hover:text-amber-600 hover:bg-amber-50 hover:-translate-y-0.5 dark:text-zinc-300 dark:hover:bg-zinc-800' => ! request()->routeIs('cart.index'),
-                       ])>
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
-                        </svg>
-                        @if ($this->cartCount > 0)
-                            <span class="absolute -top-0.5 -right-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
-                                {{ $this->cartCount > 9 ? '9+' : $this->cartCount }}
-                            </span>
-                        @endif
-                    </a>
+                    {{-- Customer-only links --}}
+                    @auth
+                        @foreach ([['dashboard', 'Dashboard'], ['orders.index', 'Orders']] as [$routeName, $label])
+                            <a href="{{ route($routeName) }}"
+                               wire:navigate
+                               @class([
+                                   'text-sm font-medium rounded-lg px-3 py-1.5 transition-all duration-200',
+                                   'bg-amber-100 text-amber-700' => request()->routeIs($routeName),
+                                   'text-gray-600 hover:text-amber-600 hover:bg-amber-50 hover:-translate-y-0.5' => ! request()->routeIs($routeName),
+                               ])>
+                                {{ $label }}
+                            </a>
+                        @endforeach
+
+                        <a href="{{ route('cart.index') }}" wire:navigate
+                           aria-label="Cart"
+                           @class([
+                               'relative flex items-center rounded-lg p-1.5 transition-all duration-200',
+                               'bg-amber-100 text-amber-700' => request()->routeIs('cart.index'),
+                               'text-gray-600 hover:text-amber-600 hover:bg-amber-50 hover:-translate-y-0.5' => ! request()->routeIs('cart.index'),
+                           ])>
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                            </svg>
+                            @if ($this->cartCount > 0)
+                                <span class="absolute -top-0.5 -right-0.5 bg-amber-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center leading-none">
+                                    {{ $this->cartCount > 9 ? '9+' : $this->cartCount }}
+                                </span>
+                            @endif
+                        </a>
+                    @endauth
                 </div>
             </div>
 
@@ -101,8 +117,7 @@ new class extends Component
                         <a href="{{ route('login') }}"
                            class="text-sm font-medium text-gray-600 border border-gray-200 rounded-lg px-4 py-1.5
                                   hover:text-amber-600 hover:border-amber-300 hover:bg-amber-50
-                                  transition-all duration-200
-                                  dark:text-zinc-300 dark:border-zinc-700 dark:hover:bg-zinc-800">
+                                  transition-all duration-200">
                             Log in
                         </a>
                         <a href="{{ route('register') }}"
@@ -139,7 +154,8 @@ new class extends Component
     {{-- Mobile menu --}}
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            @foreach ([['menu.index', 'Menu'], ['animals.index', 'Our Foxes'], ['dashboard', 'Dashboard'], ['orders.index', 'Orders'], ['cart.index', 'Cart']] as [$routeName, $label])
+            {{-- Public links --}}
+            @foreach ([['menu.index', 'Menu'], ['animals.index', 'Our Foxes']] as [$routeName, $label])
                 <a href="{{ route($routeName) }}"
                    wire:navigate
                    @class([
@@ -150,12 +166,27 @@ new class extends Component
                     {{ $label }}
                 </a>
             @endforeach
+
+            {{-- Customer-only links --}}
+            @auth
+                @foreach ([['dashboard', 'Dashboard'], ['orders.index', 'Orders'], ['cart.index', 'Cart']] as [$routeName, $label])
+                    <a href="{{ route($routeName) }}"
+                       wire:navigate
+                       @class([
+                           'block w-full ps-3 pe-4 py-2 border-l-4 text-start text-sm font-medium transition duration-150 ease-in-out',
+                           'border-amber-400 text-amber-700 bg-amber-50' => request()->routeIs($routeName),
+                           'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' => ! request()->routeIs($routeName),
+                       ])>
+                        {{ $label }}
+                    </a>
+                @endforeach
+            @endauth
         </div>
 
         @auth
-            <div class="pt-4 pb-1 border-t border-gray-200 dark:border-zinc-700">
+            <div class="pt-4 pb-1 border-t border-gray-200">
                 <div class="px-4">
-                    <div class="font-medium text-base text-gray-800 dark:text-zinc-200"
+                    <div class="font-medium text-base text-gray-800"
                          x-data="{{ json_encode(['name' => auth()->user()->name]) }}"
                          x-text="name"
                          x-on:profile-updated.window="name = $event.detail.name"></div>
