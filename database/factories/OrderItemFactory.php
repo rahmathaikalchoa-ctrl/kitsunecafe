@@ -12,13 +12,11 @@ class OrderItemFactory extends Factory
 {
     public function definition(): array
     {
-        $menuItem = MenuItem::factory()->create();
-
         return [
             'order_id' => Order::factory(),
-            'menu_item_id' => $menuItem->id,
+            'menu_item_id' => MenuItem::factory(),
             'quantity' => $this->faker->numberBetween(1, 3),
-            'price_cents' => $menuItem->price_cents,
+            'price_cents' => $this->faker->numberBetween(15000, 35000),
         ];
     }
 }

@@ -10,6 +10,13 @@ test('menu page renders', function () {
     $this->get(route('menu.index'))->assertOk();
 });
 
+test('can build more than four categories via the factory', function () {
+    // Guards against the old 4-value unique() pool, which threw OverflowException past four.
+    Category::factory()->count(6)->create();
+
+    expect(Category::count())->toBe(6);
+});
+
 test('menu shows available items', function () {
     $category = Category::factory()->create();
     $item = MenuItem::factory()->create(['category_id' => $category->id]);
