@@ -121,3 +121,12 @@ test('orders index filters by status', function () {
         ->assertSee(route('orders.show', $completed))
         ->assertDontSee(route('orders.show', $pending));
 });
+
+test('orders index ignores an invalid status filter', function () {
+    $me = User::factory()->create();
+    $order = Order::factory()->create(['user_id' => $me->id, 'status' => OrderStatus::Pending->value]);
+
+    $this->actingAs($me)->get(route('orders.index', ['status' => 'banana']))
+        ->assertOk()
+        ->assertSee(route('orders.show', $order));
+});

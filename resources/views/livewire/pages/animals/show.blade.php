@@ -21,9 +21,12 @@ new #[Layout('layouts.app')] class extends Component
     #[Computed]
     public function prevFox(): ?Animal
     {
+        // Total order by (name, id) so foxes sharing a name aren't skipped.
         return Animal::active()
-            ->where('name', '<', $this->animal->name)
-            ->orderByDesc('name')
+            ->where(fn ($q) => $q
+                ->where('name', '<', $this->animal->name)
+                ->orWhere(fn ($q) => $q->where('name', $this->animal->name)->where('id', '<', $this->animal->id)))
+            ->orderByDesc('name')->orderByDesc('id')
             ->first();
     }
 
@@ -31,8 +34,10 @@ new #[Layout('layouts.app')] class extends Component
     public function nextFox(): ?Animal
     {
         return Animal::active()
-            ->where('name', '>', $this->animal->name)
-            ->orderBy('name')
+            ->where(fn ($q) => $q
+                ->where('name', '>', $this->animal->name)
+                ->orWhere(fn ($q) => $q->where('name', $this->animal->name)->where('id', '>', $this->animal->id)))
+            ->orderBy('name')->orderBy('id')
             ->first();
     }
 }; ?>

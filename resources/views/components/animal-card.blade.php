@@ -1,4 +1,4 @@
-@props(['animal' => \App\Models\Animal::class])
+@props(['animal'])
 
 @php
     $meta = array_filter([

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Animal;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
@@ -14,14 +15,23 @@ new #[Layout('layouts.app')] class extends Component
 
     public ?int $selectedAnimalId = null;
 
+    #[Url]
     public ?string $color = null;
+
+    public function mount(): void
+    {
+        // Ignore a hand-typed/stale ?color that no active fox actually has.
+        if ($this->color !== null && ! Animal::active()->where('color', $this->color)->exists()) {
+            $this->color = null;
+        }
+    }
 
     #[Computed]
     public function animals()
     {
         return Animal::active()
             ->when($this->color, fn ($q) => $q->where('color', $this->color))
-            ->orderBy('name')
+            ->orderBy('name')->orderBy('id')
             ->paginate(12);
     }
 

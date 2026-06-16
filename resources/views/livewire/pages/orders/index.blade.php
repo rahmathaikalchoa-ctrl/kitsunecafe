@@ -15,6 +15,14 @@ new #[Layout('layouts.app')] class extends Component
     #[Url]
     public ?string $status = null;
 
+    public function mount(): void
+    {
+        // Ignore a hand-typed/stale ?status that isn't a real order status.
+        if ($this->status !== null && OrderStatus::tryFrom($this->status) === null) {
+            $this->status = null;
+        }
+    }
+
     public function updatedStatus(): void
     {
         $this->resetPage();

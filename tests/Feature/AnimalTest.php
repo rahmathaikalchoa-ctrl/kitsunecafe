@@ -72,3 +72,28 @@ test('profile page links to the next fox', function () {
         ->assertOk()
         ->assertSee('Yuki');
 });
+
+test('listing ignores an invalid colour filter', function () {
+    Animal::factory()->create(['name' => 'Hoshi', 'color' => 'Silver']);
+
+    $this->get(route('animals.index', ['color' => 'banana']))
+        ->assertOk()
+        ->assertSee('Hoshi');
+});
+
+test('prev/next stay consistent when two foxes share a name', function () {
+    Animal::factory()->create(['name' => 'Aki']);
+    $kikuA = Animal::factory()->create(['name' => 'Kiku']); // lower id
+    $kikuB = Animal::factory()->create(['name' => 'Kiku']); // higher id
+    Animal::factory()->create(['name' => 'Yuki']);
+
+    // From the lower-id "Kiku", Next must reach the higher-id "Kiku" — not skip it.
+    $this->get(route('animals.show', $kikuA))
+        ->assertOk()
+        ->assertSee(route('animals.show', $kikuB));
+
+    // From the higher-id "Kiku", Next moves on to "Yuki".
+    $this->get(route('animals.show', $kikuB))
+        ->assertOk()
+        ->assertSee('Yuki');
+});
