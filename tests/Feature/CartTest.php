@@ -117,6 +117,23 @@ test('the cart total excludes unavailable items', function () {
         ->assertDontSee('Rp 3.000');
 });
 
+test('cart count ignores items whose menu item no longer exists', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $a = MenuItem::factory()->create();
+    $b = MenuItem::factory()->create();
+
+    $cart = app(CartService::class);
+    $cart->add($a->id, 2);
+    $cart->add($b->id, 1);
+
+    $b->delete();
+
+    // Only item A's quantity remains; the deleted item is dropped from the visible cart.
+    expect($cart->count())->toBe(2);
+});
+
 test('cart total is computed from line items', function () {
     $user = User::factory()->create();
     $this->actingAs($user);

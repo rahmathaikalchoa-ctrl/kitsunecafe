@@ -48,19 +48,6 @@ class CartService
         session([self::SESSION_KEY => $cart]);
     }
 
-    public function update(int $menuItemId, int $qty): void
-    {
-        if ($qty <= 0) {
-            $this->remove($menuItemId);
-
-            return;
-        }
-
-        $cart = $this->raw();
-        $cart[$menuItemId] = $qty;
-        session([self::SESSION_KEY => $cart]);
-    }
-
     /** Relative +1 — safe against rapid clicks (each request is independent of rendered qty). */
     public function increment(int $menuItemId): void
     {
@@ -127,7 +114,9 @@ class CartService
 
     public function count(): int
     {
-        return array_sum($this->raw());
+        // Count only lines whose menu item still exists (matches the visible cart); an empty cart
+        // short-circuits in items() with no query.
+        return (int) $this->items()->sum('quantity');
     }
 
     public function isEmpty(): bool
