@@ -105,24 +105,13 @@ new #[Layout('layouts.admin')] class extends Component
 
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
         @foreach ($cards as $card)
-            @php $tag = $card['href'] ? 'a' : 'div'; @endphp
-            <{{ $tag }}
-                @if ($card['href']) href="{{ $card['href'] }}" wire:navigate @endif
-                @class([
-                    'rounded-2xl bg-white border border-gray-100 shadow-xs p-5 flex items-center gap-4',
-                    'transition hover:-translate-y-0.5 hover:shadow-md hover:border-amber-200' => $card['href'],
-                ])>
-                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl {{ $card['tint'] }}">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $card['icon'] }}" />
-                    </svg>
-                </span>
-                <div class="min-w-0">
-                    <p class="text-sm font-medium text-gray-500">{{ $card['label'] }}</p>
-                    <p class="mt-0.5 text-2xl font-bold text-gray-900">{{ $card['value'] }}</p>
-                    <p class="text-xs text-gray-400">{{ $card['sub'] }}</p>
-                </div>
-            </{{ $tag }}>
+            <x-admin.stat-card
+                :label="$card['label']"
+                :value="$card['value']"
+                :sub="$card['sub']"
+                :href="$card['href']"
+                :tint="$card['tint']"
+                :icon="$card['icon']" />
         @endforeach
     </div>
 </div>
