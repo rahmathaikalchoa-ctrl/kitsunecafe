@@ -46,6 +46,41 @@ test('a non-staff user cannot advance an order', function () {
     expect($order->fresh()->status)->toBe(OrderStatus::Pending);
 });
 
+test('staff can reject a pending order', function () {
+    $staff = User::factory()->staff()->create();
+    $order = Order::factory()->create(['status' => OrderStatus::Pending->value]);
+
+    $this->actingAs($staff);
+
+    Volt::test('pages.orders.show', ['order' => $order])
+        ->call('reject');
+
+    expect($order->fresh()->status)->toBe(OrderStatus::Cancelled);
+});
+
+test('hides customer action buttons from staff viewing another customers order', function () {
+    $staff = User::factory()->staff()->create();
+    $order = Order::factory()->create(['status' => OrderStatus::Pending->value]); // owned by someone else
+
+    $this->actingAs($staff);
+
+    Volt::test('pages.orders.show', ['order' => $order])
+        ->assertDontSee('Order again')
+        ->assertSee('Reject order');
+});
+
+test('staff can reject an order from the staff list', function () {
+    $staff = User::factory()->staff()->create();
+    $order = Order::factory()->create(['status' => OrderStatus::Pending->value]);
+
+    $this->actingAs($staff);
+
+    Volt::test('pages.staff.orders')
+        ->call('reject', $order->id);
+
+    expect($order->fresh()->status)->toBe(OrderStatus::Cancelled);
+});
+
 test('an invalid status transition is a no-op', function () {
     $staff = User::factory()->staff()->create();
     // Pending cannot jump straight to Completed.

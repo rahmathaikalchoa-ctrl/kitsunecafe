@@ -64,6 +64,11 @@ new #[Layout('layouts.app')] class extends Component
         $this->transition(OrderStatus::Completed);
     }
 
+    public function reject(): void
+    {
+        $this->transition(OrderStatus::Cancelled);
+    }
+
     private function transition(OrderStatus $to): void
     {
         abort_unless(auth()->user()->can('manage', $this->order), 403);
@@ -128,6 +133,7 @@ new #[Layout('layouts.app')] class extends Component
                 <p class="text-sm text-gray-500">
                     Total <span class="ml-1 text-lg font-bold text-amber-700"><x-rupiah :amount="$order->total_cents" /></span>
                 </p>
+                @if ($order->user_id === auth()->id())
                 <div class="flex items-center gap-2">
                     @if ($order->status->isCancellable())
                         <button
@@ -163,26 +169,39 @@ new #[Layout('layouts.app')] class extends Component
                         <span wire:loading wire:target="orderAgain">Adding…</span>
                     </button>
                 </div>
+                @endif
             </div>
 
             {{-- Staff controls: advance the order through its lifecycle --}}
             @can('manage', $order)
                 <div class="mt-4 rounded-xl border border-amber-100 bg-amber-50/60 p-4">
                     <p class="text-xs font-semibold uppercase tracking-wide text-amber-700 mb-3">Staff controls</p>
-                    @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Confirmed) || $order->status->canTransitionTo(\App\Enums\OrderStatus::Completed))
+                    @php
+                        $canConfirm = $order->status->canTransitionTo(\App\Enums\OrderStatus::Confirmed);
+                        $canComplete = $order->status->canTransitionTo(\App\Enums\OrderStatus::Completed);
+                        $canReject = $order->status->canTransitionTo(\App\Enums\OrderStatus::Cancelled);
+                    @endphp
+                    @if ($canConfirm || $canComplete || $canReject)
                         <div class="flex flex-wrap items-center gap-2">
-                            @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Confirmed))
+                            @if ($canConfirm)
                                 <button wire:click="confirm" wire:loading.attr="disabled" wire:target="confirm" type="button"
                                         class="inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 transition-colors disabled:opacity-50 disabled:cursor-wait">
                                     <span wire:loading.remove wire:target="confirm">Confirm order</span>
                                     <span wire:loading wire:target="confirm">Confirming…</span>
                                 </button>
                             @endif
-                            @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Completed))
+                            @if ($canComplete)
                                 <button wire:click="complete" wire:loading.attr="disabled" wire:target="complete" type="button"
                                         class="inline-flex items-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-2 px-4 transition-colors disabled:opacity-50 disabled:cursor-wait">
                                     <span wire:loading.remove wire:target="complete">Mark completed</span>
                                     <span wire:loading wire:target="complete">Completing…</span>
+                                </button>
+                            @endif
+                            @if ($canReject)
+                                <button wire:click="reject" wire:confirm="Cancel this customer's order?" wire:loading.attr="disabled" wire:target="reject" type="button"
+                                        class="inline-flex items-center gap-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-sm font-semibold py-2 px-4 transition-colors disabled:opacity-50 disabled:cursor-wait">
+                                    <span wire:loading.remove wire:target="reject">Reject order</span>
+                                    <span wire:loading wire:target="reject">Rejecting…</span>
                                 </button>
                             @endif
                         </div>

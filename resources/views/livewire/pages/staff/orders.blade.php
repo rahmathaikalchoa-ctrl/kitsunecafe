@@ -41,6 +41,11 @@ new #[Layout('layouts.app')] class extends Component
         $this->transition($orderId, OrderStatus::Completed);
     }
 
+    public function reject(int $orderId): void
+    {
+        $this->transition($orderId, OrderStatus::Cancelled);
+    }
+
     private function transition(int $orderId, OrderStatus $to): void
     {
         $order = Order::findOrFail($orderId);
@@ -103,7 +108,7 @@ new #[Layout('layouts.app')] class extends Component
 
         @if ($orders->isEmpty())
             <div class="text-center py-16 text-gray-400">
-                <p class="text-lg">No {{ $status }} orders.</p>
+                <p class="text-lg">@if ($status) No {{ $status }} orders. @else No orders yet. @endif</p>
             </div>
         @else
             <ul class="space-y-3">
@@ -127,18 +132,29 @@ new #[Layout('layouts.app')] class extends Component
                             <span class="text-base font-bold text-amber-700 shrink-0"><x-rupiah :amount="$order->total_cents" /></span>
                         </div>
 
-                        @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Confirmed) || $order->status->canTransitionTo(\App\Enums\OrderStatus::Completed))
+                        @php
+                            $canConfirm = $order->status->canTransitionTo(\App\Enums\OrderStatus::Confirmed);
+                            $canComplete = $order->status->canTransitionTo(\App\Enums\OrderStatus::Completed);
+                            $canReject = $order->status->canTransitionTo(\App\Enums\OrderStatus::Cancelled);
+                        @endphp
+                        @if ($canConfirm || $canComplete || $canReject)
                             <div class="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-100 pt-3">
-                                @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Confirmed))
+                                @if ($canConfirm)
                                     <button wire:click="confirm({{ $order->id }})" wire:loading.attr="disabled" wire:target="confirm({{ $order->id }})" type="button"
                                             class="inline-flex items-center gap-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-1.5 px-3.5 transition-colors disabled:opacity-50 disabled:cursor-wait">
                                         Confirm
                                     </button>
                                 @endif
-                                @if ($order->status->canTransitionTo(\App\Enums\OrderStatus::Completed))
+                                @if ($canComplete)
                                     <button wire:click="complete({{ $order->id }})" wire:loading.attr="disabled" wire:target="complete({{ $order->id }})" type="button"
                                             class="inline-flex items-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-semibold py-1.5 px-3.5 transition-colors disabled:opacity-50 disabled:cursor-wait">
                                         Mark completed
+                                    </button>
+                                @endif
+                                @if ($canReject)
+                                    <button wire:click="reject({{ $order->id }})" wire:confirm="Cancel this customer's order?" wire:loading.attr="disabled" wire:target="reject({{ $order->id }})" type="button"
+                                            class="inline-flex items-center gap-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-sm font-semibold py-1.5 px-3.5 transition-colors disabled:opacity-50 disabled:cursor-wait">
+                                        Reject
                                     </button>
                                 @endif
                             </div>
