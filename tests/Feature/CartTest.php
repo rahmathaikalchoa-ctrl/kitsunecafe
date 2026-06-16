@@ -43,6 +43,50 @@ test('cart service removes items correctly', function () {
     expect($cart->isEmpty())->toBeTrue();
 });
 
+test('cart service increments an item by one', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $item = MenuItem::factory()->create(['price_cents' => 1000]);
+
+    $cart = app(CartService::class);
+    $cart->add($item->id);
+    $cart->increment($item->id);
+
+    expect($cart->count())->toBe(2);
+});
+
+test('cart service decrements and removes the line at zero', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $item = MenuItem::factory()->create();
+
+    $cart = app(CartService::class);
+    $cart->add($item->id, 2);
+
+    $cart->decrement($item->id);
+    expect($cart->count())->toBe(1);
+
+    $cart->decrement($item->id);
+    expect($cart->isEmpty())->toBeTrue();
+});
+
+test('cart flags an unavailable item and warns', function () {
+    $user = User::factory()->create();
+    $category = Category::factory()->create();
+    $available = MenuItem::factory()->create(['category_id' => $category->id]);
+    $gone = MenuItem::factory()->unavailable()->create(['category_id' => $category->id]);
+
+    $this->actingAs($user);
+    session(['cart' => [$available->id => 1, $gone->id => 1]]);
+
+    $this->get(route('cart.index'))
+        ->assertOk()
+        ->assertSee('Unavailable')
+        ->assertSee('no longer available');
+});
+
 test('cart total is computed from line items', function () {
     $user = User::factory()->create();
     $this->actingAs($user);

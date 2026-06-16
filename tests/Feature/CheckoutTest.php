@@ -45,6 +45,21 @@ test('user can place an order', function () {
     expect(Order::where('user_id', $user->id)->exists())->toBeTrue();
 });
 
+test('checkout surfaces an error when an item is no longer available', function () {
+    $user = User::factory()->create();
+    $item = MenuItem::factory()->unavailable()->create();
+
+    $this->actingAs($user);
+    session(['cart' => [$item->id => 1]]);
+
+    Volt::test('pages.checkout.index')
+        ->set('tableNumber', 1)
+        ->call('placeOrder')
+        ->assertHasErrors('cart');
+
+    expect(Order::where('user_id', $user->id)->exists())->toBeFalse();
+});
+
 test('a dine-in order requires a table to be chosen', function () {
     $user = User::factory()->create();
     $item = MenuItem::factory()->create();

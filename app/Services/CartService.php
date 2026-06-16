@@ -61,6 +61,31 @@ class CartService
         session([self::SESSION_KEY => $cart]);
     }
 
+    /** Relative +1 — safe against rapid clicks (each request is independent of rendered qty). */
+    public function increment(int $menuItemId): void
+    {
+        $this->add($menuItemId, 1);
+    }
+
+    /** Relative -1; removes the line when it would hit zero. */
+    public function decrement(int $menuItemId): void
+    {
+        $cart = $this->raw();
+
+        if (! isset($cart[$menuItemId])) {
+            return;
+        }
+
+        if ($cart[$menuItemId] <= 1) {
+            $this->remove($menuItemId);
+
+            return;
+        }
+
+        $cart[$menuItemId]--;
+        session([self::SESSION_KEY => $cart]);
+    }
+
     public function clear(): void
     {
         session()->forget(self::SESSION_KEY);

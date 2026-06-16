@@ -19,18 +19,34 @@ new #[Layout('layouts.app')] class extends Component
         return app(CartService::class)->totalCents();
     }
 
-    public function remove(int $menuItemId): void
+    /** True when any line is no longer available — blocks checkout until it's removed. */
+    #[Computed]
+    public function hasUnavailable(): bool
     {
-        app(CartService::class)->remove($menuItemId);
-        unset($this->cartItems);
-        unset($this->total);
+        return $this->cartItems->contains(fn ($line) => ! $line->item->is_available);
     }
 
-    public function update(int $menuItemId, int $qty): void
+    public function increment(int $menuItemId, CartService $cart): void
     {
-        app(CartService::class)->update($menuItemId, $qty);
-        unset($this->cartItems);
-        unset($this->total);
+        $cart->increment($menuItemId);
+        $this->refreshTotals();
+    }
+
+    public function decrement(int $menuItemId, CartService $cart): void
+    {
+        $cart->decrement($menuItemId);
+        $this->refreshTotals();
+    }
+
+    public function remove(int $menuItemId, CartService $cart): void
+    {
+        $cart->remove($menuItemId);
+        $this->refreshTotals();
+    }
+
+    private function refreshTotals(): void
+    {
+        unset($this->cartItems, $this->total, $this->hasUnavailable);
     }
 }; ?>
 
@@ -79,18 +95,25 @@ new #[Layout('layouts.app')] class extends Component
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         @foreach ($this->cartItems as $line)
-                            <tr wire:key="cart-{{ $line->item->id }}">
+                            <tr wire:key="cart-{{ $line->item->id }}" @class(['opacity-60' => ! $line->item->is_available])>
                                 <td class="px-6 py-4">
-                                    <p class="font-medium text-gray-900">{{ $line->item->name }}</p>
+                                    <p class="font-medium text-gray-900">
+                                        {{ $line->item->name }}
+                                        @unless ($line->item->is_available)
+                                            <span class="ml-1 inline-flex items-center rounded-full bg-red-50 border border-red-100 text-red-600 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5">Unavailable</span>
+                                        @endunless
+                                    </p>
                                     <p class="text-gray-400 text-xs"><x-rupiah :amount="$line->item->price_cents" /> each</p>
                                 </td>
                                 <td class="px-4 py-4">
                                     <div class="flex items-center justify-center gap-2">
-                                        <button wire:click="update({{ $line->item->id }}, {{ $line->quantity - 1 }})"
-                                                class="w-7 h-7 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-amber-400 hover:text-amber-600 transition text-base">−</button>
+                                        <button wire:click="decrement({{ $line->item->id }})"
+                                                @disabled(! $line->item->is_available)
+                                                class="w-7 h-7 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-amber-400 hover:text-amber-600 transition text-base disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-500">−</button>
                                         <span class="w-6 text-center font-medium text-gray-800">{{ $line->quantity }}</span>
-                                        <button wire:click="update({{ $line->item->id }}, {{ $line->quantity + 1 }})"
-                                                class="w-7 h-7 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-amber-400 hover:text-amber-600 transition text-base">+</button>
+                                        <button wire:click="increment({{ $line->item->id }})"
+                                                @disabled(! $line->item->is_available)
+                                                class="w-7 h-7 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 hover:border-amber-400 hover:text-amber-600 transition text-base disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-200 disabled:hover:text-gray-500">+</button>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-right font-medium text-gray-800">
@@ -120,17 +143,32 @@ new #[Layout('layouts.app')] class extends Component
                 </table>
             </div>
 
+            @if ($this->hasUnavailable)
+                <div class="mt-6 flex items-start gap-3 rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-700" role="alert">
+                    <svg class="h-5 w-5 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+                    </svg>
+                    <span>Some items are no longer available. Please remove them to continue to checkout.</span>
+                </div>
+            @endif
+
             <div class="mt-6 flex justify-end">
-                <a href="{{ route('checkout.index') }}" wire:navigate>
-                    <flux:button variant="primary">
-                        <span class="flex items-center gap-2">
-                            Proceed to Checkout
-                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
-                            </svg>
-                        </span>
+                @if ($this->hasUnavailable)
+                    <flux:button variant="primary" disabled>
+                        Proceed to Checkout
                     </flux:button>
-                </a>
+                @else
+                    <a href="{{ route('checkout.index') }}" wire:navigate>
+                        <flux:button variant="primary">
+                            <span class="flex items-center gap-2">
+                                Proceed to Checkout
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+                                </svg>
+                            </span>
+                        </flux:button>
+                    </a>
+                @endif
             </div>
         @endif
     </div>

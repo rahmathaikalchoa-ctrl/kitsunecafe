@@ -126,6 +126,16 @@ new #[Layout('layouts.app')] class extends Component
                     <flux:error name="notes" />
                 </flux:field>
 
+                {{-- Backstop: surfaces e.g. "Some items are no longer available" from OrderService. --}}
+                @error('cart')
+                    <div class="flex items-start gap-3 rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-700" role="alert">
+                        <svg class="h-5 w-5 shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+                        </svg>
+                        <span>{{ $message }}</span>
+                    </div>
+                @enderror
+
                 <flux:button type="submit" variant="primary" class="w-full">
                     Place Order
                 </flux:button>
