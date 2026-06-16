@@ -16,7 +16,10 @@
             ->map(fn ($word) => mb_strtoupper(mb_substr($word, 0, 1)))
             ->take(2)
             ->implode('');
-        $ordersCount = $user->orders()->count();
+        // Exclude cancelled orders so this matches the dashboard's order count.
+        $ordersCount = $user->orders()
+            ->where('status', '!=', \App\Enums\OrderStatus::Cancelled->value)
+            ->count();
     @endphp
 
     <div class="py-12">

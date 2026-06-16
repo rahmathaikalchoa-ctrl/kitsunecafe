@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+// Email verification is intentionally NOT enforced for this app: User does not implement
+// MustVerifyEmail, so the `verified` middleware is a no-op and the profile's verify-email UI
+// stays hidden. To require verification later, implement MustVerifyEmail here.
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
