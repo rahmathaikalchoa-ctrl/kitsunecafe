@@ -59,6 +59,20 @@ test('the create modal prompts to add a category when none exist', function () {
         ->assertSee('go to Categories');
 });
 
+test('validation errors use friendly attribute names', function () {
+    $category = Category::factory()->create();
+
+    Volt::test('pages.admin.menu')
+        ->call('openCreate')
+        ->set('name', 'Fox Latte')
+        ->set('categoryId', $category->id)
+        // priceCents left empty.
+        ->call('save')
+        ->assertHasErrors('priceCents')
+        ->assertSee('The price field is required.')
+        ->assertDontSee('price cents');
+});
+
 test('staff can create a menu item', function () {
     $category = Category::factory()->create();
 

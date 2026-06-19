@@ -94,6 +94,15 @@ new #[Layout('layouts.admin')] class extends Component
         $this->dispatch('open-menu-form');
     }
 
+    protected function validationAttributes(): array
+    {
+        return [
+            'categoryId' => 'category',
+            'priceCents' => 'price',
+            'imagePath' => 'image',
+        ];
+    }
+
     public function save(): void
     {
         $validated = $this->validate([
@@ -216,7 +225,7 @@ new #[Layout('layouts.admin')] class extends Component
                             <th class="px-4 py-3 font-semibold">Category</th>
                             <th class="px-4 py-3 font-semibold text-right">Price</th>
                             <th class="px-4 py-3 font-semibold">Status</th>
-                            <th class="px-4 py-3"></th>
+                            <th class="px-4 py-3"><span class="sr-only">Actions</span></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
@@ -303,7 +312,7 @@ new #[Layout('layouts.admin')] class extends Component
 
                     <flux:field>
                         <flux:label>Image URL or filename <span class="text-gray-400 font-normal">(optional)</span></flux:label>
-                        <flux:input wire:model.live.debounce.500ms="imagePath" type="text" placeholder="https://… or images/menu/file.jpg" />
+                        <flux:input wire:model.live.debounce.500ms="imagePath" type="text" placeholder="https://… or file.jpg" />
                         <flux:error name="imagePath" />
                         @if ($this->previewUrl)
                             <img src="{{ $this->previewUrl }}" alt="Preview"
