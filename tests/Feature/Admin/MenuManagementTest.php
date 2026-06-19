@@ -43,6 +43,22 @@ test('staff can filter the menu by availability', function () {
         ->assertDontSee('Fox Latte');
 });
 
+test('staff can see a thumbnail for an item with an image', function () {
+    $item = MenuItem::factory()->create([
+        'name' => 'Fox Latte',
+        'image_path' => 'https://example.com/latte.jpg',
+    ]);
+
+    Volt::test('pages.admin.menu')
+        ->assertSee($item->imageUrl());
+});
+
+test('the create modal prompts to add a category when none exist', function () {
+    // No categories created.
+    Volt::test('pages.admin.menu')
+        ->assertSee('go to Categories');
+});
+
 test('staff can create a menu item', function () {
     $category = Category::factory()->create();
 

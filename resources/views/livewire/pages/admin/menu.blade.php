@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Category;
 use App\Models\MenuItem;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
@@ -35,6 +36,16 @@ new #[Layout('layouts.admin')] class extends Component
     public bool $isAvailable = true;
 
     public string $imagePath = '';
+
+    #[Computed]
+    public function previewUrl(): ?string
+    {
+        // Resolve the typed path through the model's helper so the http-vs-asset
+        // logic stays in one place (App\Models\MenuItem::imageUrl()).
+        return $this->imagePath
+            ? (new MenuItem(['image_path' => $this->imagePath]))->imageUrl()
+            : null;
+    }
 
     public function mount(): void
     {
@@ -196,10 +207,12 @@ new #[Layout('layouts.admin')] class extends Component
             </div>
         @else
             <div class="bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-100 text-left text-xs uppercase tracking-wide text-gray-500">
                         <tr>
-                            <th class="px-5 py-3 font-semibold">Item</th>
+                            <th class="px-5 py-3"><span class="sr-only">Image</span></th>
+                            <th class="px-4 py-3 font-semibold">Item</th>
                             <th class="px-4 py-3 font-semibold">Category</th>
                             <th class="px-4 py-3 font-semibold text-right">Price</th>
                             <th class="px-4 py-3 font-semibold">Status</th>
@@ -209,7 +222,15 @@ new #[Layout('layouts.admin')] class extends Component
                     <tbody class="divide-y divide-gray-50">
                         @foreach ($items as $item)
                             <tr wire:key="menu-{{ $item->id }}" class="hover:bg-amber-50/40 transition-colors">
-                                <td class="px-5 py-3 font-medium text-gray-900">{{ $item->name }}</td>
+                                <td class="px-5 py-3">
+                                    @if ($item->image_path)
+                                        <img src="{{ $item->imageUrl() }}" alt="{{ $item->name }}" loading="lazy"
+                                             class="h-10 w-10 rounded-lg object-cover border border-gray-100" />
+                                    @else
+                                        <div class="h-10 w-10 rounded-lg bg-gray-100 border border-gray-200" aria-hidden="true"></div>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900">{{ $item->name }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $item->category?->name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-right text-gray-700"><x-rupiah :amount="$item->price_cents" /></td>
                                 <td class="px-4 py-3">
@@ -232,6 +253,7 @@ new #[Layout('layouts.admin')] class extends Component
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <div class="mt-6">{{ $items->links() }}</div>
@@ -250,15 +272,22 @@ new #[Layout('layouts.admin')] class extends Component
                         <flux:error name="name" />
                     </flux:field>
 
-                    <flux:field>
-                        <flux:label>Category</flux:label>
-                        <flux:select wire:model="categoryId" placeholder="Choose a category…">
-                            @foreach ($categories as $category)
-                                <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
-                            @endforeach
-                        </flux:select>
-                        <flux:error name="categoryId" />
-                    </flux:field>
+                    @if ($categories->isEmpty())
+                        <div class="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm text-amber-700">
+                            Add a category first —
+                            <a href="{{ route('admin.categories') }}" wire:navigate class="font-medium underline">go to Categories</a>.
+                        </div>
+                    @else
+                        <flux:field>
+                            <flux:label>Category</flux:label>
+                            <flux:select wire:model="categoryId" placeholder="Choose a category…">
+                                @foreach ($categories as $category)
+                                    <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
+                                @endforeach
+                            </flux:select>
+                            <flux:error name="categoryId" />
+                        </flux:field>
+                    @endif
 
                     <flux:field>
                         <flux:label>Price (Rp)</flux:label>
@@ -274,8 +303,12 @@ new #[Layout('layouts.admin')] class extends Component
 
                     <flux:field>
                         <flux:label>Image URL or filename <span class="text-gray-400 font-normal">(optional)</span></flux:label>
-                        <flux:input wire:model="imagePath" type="text" placeholder="https://… or images/menu/file.jpg" />
+                        <flux:input wire:model.live.debounce.500ms="imagePath" type="text" placeholder="https://… or images/menu/file.jpg" />
                         <flux:error name="imagePath" />
+                        @if ($this->previewUrl)
+                            <img src="{{ $this->previewUrl }}" alt="Preview"
+                                 class="mt-2 h-24 w-24 rounded-xl object-cover border border-gray-100" />
+                        @endif
                     </flux:field>
 
                     <flux:checkbox wire:model="isAvailable" label="Available to order" />
