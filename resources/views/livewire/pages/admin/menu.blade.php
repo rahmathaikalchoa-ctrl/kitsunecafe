@@ -5,12 +5,22 @@ declare(strict_types=1);
 use App\Models\Category;
 use App\Models\MenuItem;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Url;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
 
 new #[Layout('layouts.admin')] class extends Component
 {
     use WithPagination;
+
+    #[Url]
+    public string $search = '';
+
+    #[Url]
+    public ?int $categoryFilter = null;
+
+    #[Url]
+    public ?string $availability = null; // 'available' | 'hidden'
 
     public ?int $editingId = null;
 
@@ -25,6 +35,29 @@ new #[Layout('layouts.admin')] class extends Component
     public bool $isAvailable = true;
 
     public string $imagePath = '';
+
+    public function mount(): void
+    {
+        // Ignore a hand-typed/stale ?availability that isn't a real value.
+        if (! in_array($this->availability, ['available', 'hidden'], true)) {
+            $this->availability = null;
+        }
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedCategoryFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedAvailability(): void
+    {
+        $this->resetPage();
+    }
 
     public function openCreate(): void
     {
@@ -98,7 +131,13 @@ new #[Layout('layouts.admin')] class extends Component
     public function with(): array
     {
         return [
-            'items' => MenuItem::with('category')->orderBy('name')->paginate(15),
+            'items' => MenuItem::with('category')
+                ->when(trim($this->search), fn ($q, $term) => $q->where('name', 'like', "%{$term}%"))
+                ->when($this->categoryFilter, fn ($q, $id) => $q->where('category_id', $id))
+                ->when($this->availability === 'available', fn ($q) => $q->where('is_available', true))
+                ->when($this->availability === 'hidden', fn ($q) => $q->where('is_available', false))
+                ->orderBy('name')
+                ->paginate(15),
             'categories' => Category::orderBy('name')->get(),
         ];
     }
@@ -122,10 +161,38 @@ new #[Layout('layouts.admin')] class extends Component
             <div class="mb-4 rounded-xl bg-red-50 border border-red-100 px-4 py-3 text-sm text-red-700" role="alert">{{ $message }}</div>
         @enderror
 
+        {{-- Filters --}}
+        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end">
+            <flux:field class="flex-1">
+                <flux:label class="sr-only">Search menu items</flux:label>
+                <flux:input wire:model.live.debounce.300ms="search" type="search"
+                    placeholder="Search items…" icon="magnifying-glass" clearable />
+            </flux:field>
+            <flux:field class="sm:w-48">
+                <flux:label class="sr-only">Filter by category</flux:label>
+                <flux:select wire:model.live="categoryFilter" placeholder="All categories">
+                    @foreach ($categories as $category)
+                        <flux:select.option value="{{ $category->id }}">{{ $category->name }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+            </flux:field>
+            <flux:field class="sm:w-40">
+                <flux:label class="sr-only">Filter by availability</flux:label>
+                <flux:select wire:model.live="availability" placeholder="All statuses">
+                    <flux:select.option value="available">Available</flux:select.option>
+                    <flux:select.option value="hidden">Hidden</flux:select.option>
+                </flux:select>
+            </flux:field>
+        </div>
+
         @if ($items->isEmpty())
             <div class="text-center py-16 text-gray-400">
-                <p class="text-lg">No menu items yet.</p>
-                <button wire:click="openCreate" class="mt-3 text-sm font-medium text-amber-600 hover:underline">Add the first item</button>
+                @if ($search || $categoryFilter || $availability)
+                    <p class="text-lg">No items match your filters.</p>
+                @else
+                    <p class="text-lg">No menu items yet.</p>
+                    <button wire:click="openCreate" class="mt-3 text-sm font-medium text-amber-600 hover:underline">Add the first item</button>
+                @endif
             </div>
         @else
             <div class="bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden">

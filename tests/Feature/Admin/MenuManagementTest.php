@@ -11,6 +11,38 @@ beforeEach(function () {
     $this->actingAs(User::factory()->staff()->create());
 });
 
+test('staff can search the menu by name', function () {
+    $match = MenuItem::factory()->create(['name' => 'Fox Ramen']);
+    $other = MenuItem::factory()->create(['name' => 'Berry Parfait']);
+
+    Volt::test('pages.admin.menu')
+        ->set('search', 'Ramen')
+        ->assertSee('Fox Ramen')
+        ->assertDontSee('Berry Parfait');
+});
+
+test('staff can filter the menu by category', function () {
+    $drinks = Category::factory()->create();
+    $food = Category::factory()->create();
+    $latte = MenuItem::factory()->create(['name' => 'Fox Latte', 'category_id' => $drinks->id]);
+    $ramen = MenuItem::factory()->create(['name' => 'Fox Ramen', 'category_id' => $food->id]);
+
+    Volt::test('pages.admin.menu')
+        ->set('categoryFilter', $drinks->id)
+        ->assertSee('Fox Latte')
+        ->assertDontSee('Fox Ramen');
+});
+
+test('staff can filter the menu by availability', function () {
+    $available = MenuItem::factory()->create(['name' => 'Fox Latte', 'is_available' => true]);
+    $hidden = MenuItem::factory()->create(['name' => 'Secret Special', 'is_available' => false]);
+
+    Volt::test('pages.admin.menu')
+        ->set('availability', 'hidden')
+        ->assertSee('Secret Special')
+        ->assertDontSee('Fox Latte');
+});
+
 test('staff can create a menu item', function () {
     $category = Category::factory()->create();
 
