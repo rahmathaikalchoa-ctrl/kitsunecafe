@@ -86,6 +86,17 @@ test('a non-staff user cannot mutate menu items', function () {
     expect(MenuItem::find($item->id))->not->toBeNull();
 });
 
+test('the menu overview stat strip renders', function () {
+    MenuItem::factory()->create(['is_available' => true]);
+    MenuItem::factory()->create(['is_available' => false]);
+
+    Volt::test('pages.admin.menu')
+        ->assertSee('Items')
+        ->assertSee('Available')
+        ->assertSee('Hidden')
+        ->assertSee('Categories');
+});
+
 test('staff can create a menu item', function () {
     $category = Category::factory()->create();
 
