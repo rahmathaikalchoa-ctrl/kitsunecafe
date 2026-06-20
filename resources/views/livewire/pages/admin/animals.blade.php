@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Enums\AnimalSpecies;
 use App\Models\Animal;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
@@ -41,6 +42,21 @@ new #[Layout('layouts.admin')] class extends Component
 
     public bool $isActive = true;
 
+    #[Computed]
+    public function previewUrl(): ?string
+    {
+        // Resolve the typed path through the model's helper so the http-vs-asset
+        // logic stays in one place (App\Models\Animal::imageUrl()).
+        return $this->imagePath
+            ? (new Animal(['image_path' => $this->imagePath]))->imageUrl()
+            : null;
+    }
+
+    private function ensureStaff(): void
+    {
+        abort_unless(auth()->user()?->is_staff, 403);
+    }
+
     public function openCreate(): void
     {
         $this->reset('editingId', 'name', 'gender', 'age', 'color', 'arrivedYear', 'description', 'favouriteTreat', 'favouriteSpot', 'personality', 'funFacts', 'imagePath');
@@ -52,6 +68,8 @@ new #[Layout('layouts.admin')] class extends Component
 
     public function openEdit(int $id): void
     {
+        $this->ensureStaff();
+
         $animal = Animal::findOrFail($id);
 
         $this->editingId = $animal->id;
@@ -73,8 +91,21 @@ new #[Layout('layouts.admin')] class extends Component
         $this->dispatch('open-animal-form');
     }
 
+    protected function validationAttributes(): array
+    {
+        return [
+            'arrivedYear' => 'year at the cafe',
+            'favouriteTreat' => 'favourite treat',
+            'favouriteSpot' => 'favourite spot',
+            'funFacts' => 'fun facts',
+            'imagePath' => 'image',
+        ];
+    }
+
     public function save(): void
     {
+        $this->ensureStaff();
+
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'species' => ['required', Rule::enum(AnimalSpecies::class)],
@@ -114,12 +145,16 @@ new #[Layout('layouts.admin')] class extends Component
 
     public function toggleActive(int $id): void
     {
+        $this->ensureStaff();
+
         $animal = Animal::findOrFail($id);
         $animal->update(['is_active' => ! $animal->is_active]);
     }
 
     public function delete(int $id): void
     {
+        $this->ensureStaff();
+
         Animal::findOrFail($id)->delete();
     }
 
@@ -161,19 +196,29 @@ new #[Layout('layouts.admin')] class extends Component
             </div>
         @else
             <div class="bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden">
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-100 text-left text-xs uppercase tracking-wide text-gray-500">
                         <tr>
-                            <th class="px-5 py-3 font-semibold">Name</th>
+                            <th class="px-5 py-3"><span class="sr-only">Image</span></th>
+                            <th class="px-4 py-3 font-semibold">Name</th>
                             <th class="px-4 py-3 font-semibold">Colour</th>
                             <th class="px-4 py-3 font-semibold">Status</th>
-                            <th class="px-4 py-3"></th>
+                            <th class="px-4 py-3"><span class="sr-only">Actions</span></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         @foreach ($animals as $animal)
                             <tr wire:key="animal-{{ $animal->id }}" class="hover:bg-amber-50/40 transition-colors">
-                                <td class="px-5 py-3 font-medium text-gray-900">{{ $animal->name }}</td>
+                                <td class="px-5 py-3">
+                                    @if ($animal->image_path)
+                                        <img src="{{ $animal->imageUrl() }}" alt="{{ $animal->name }}" loading="lazy"
+                                             class="h-10 w-10 rounded-lg object-cover border border-gray-100" />
+                                    @else
+                                        <div class="h-10 w-10 rounded-lg bg-gray-100 border border-gray-200" aria-hidden="true"></div>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900">{{ $animal->name }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $animal->color ?? '—' }}</td>
                                 <td class="px-4 py-3">
                                     @if ($animal->is_active)
@@ -195,6 +240,7 @@ new #[Layout('layouts.admin')] class extends Component
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <div class="mt-6">{{ $animals->links() }}</div>
@@ -277,8 +323,12 @@ new #[Layout('layouts.admin')] class extends Component
 
                     <flux:field>
                         <flux:label>Image URL or filename <span class="text-gray-400 font-normal">(optional)</span></flux:label>
-                        <flux:input wire:model="imagePath" type="text" placeholder="https://… or kiku.jpg" />
+                        <flux:input wire:model.live.debounce.500ms="imagePath" type="text" placeholder="https://… or kiku.jpg" />
                         <flux:error name="imagePath" />
+                        @if ($this->previewUrl)
+                            <img src="{{ $this->previewUrl }}" alt="Preview"
+                                 class="mt-2 h-24 w-24 rounded-xl object-cover border border-gray-100" />
+                        @endif
                     </flux:field>
 
                     <flux:checkbox wire:model="isActive" label="Active (shown to customers)" />

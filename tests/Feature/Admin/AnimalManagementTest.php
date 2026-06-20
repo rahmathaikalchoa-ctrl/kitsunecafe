@@ -8,6 +8,41 @@ beforeEach(function () {
     $this->actingAs(User::factory()->staff()->create());
 });
 
+test('a non-staff user cannot mutate animals', function () {
+    $user = User::factory()->create(); // not staff
+    $animal = Animal::factory()->create();
+
+    $this->actingAs($user);
+
+    Volt::test('pages.admin.animals')
+        ->call('delete', $animal->id)
+        ->assertForbidden();
+
+    expect(Animal::find($animal->id))->not->toBeNull();
+});
+
+test('validation errors use friendly attribute names', function () {
+    Volt::test('pages.admin.animals')
+        ->call('openCreate')
+        ->set('name', 'Aki')
+        ->set('description', 'A curious young fox.')
+        ->set('arrivedYear', 1999) // below the min:2000 rule
+        ->call('save')
+        ->assertHasErrors('arrivedYear')
+        ->assertSee('year at the cafe')
+        ->assertDontSee('arrived year');
+});
+
+test('the table shows a thumbnail for an animal with an image', function () {
+    $animal = Animal::factory()->create([
+        'name' => 'Kiku',
+        'image_path' => 'https://example.com/kiku.jpg',
+    ]);
+
+    Volt::test('pages.admin.animals')
+        ->assertSee($animal->imageUrl());
+});
+
 test('staff can create a fox with comma-separated personality and fun facts', function () {
     Volt::test('pages.admin.animals')
         ->call('openCreate')
