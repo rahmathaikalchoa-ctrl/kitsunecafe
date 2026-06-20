@@ -73,6 +73,19 @@ test('validation errors use friendly attribute names', function () {
         ->assertDontSee('price cents');
 });
 
+test('a non-staff user cannot mutate menu items', function () {
+    $user = User::factory()->create(); // not staff
+    $item = MenuItem::factory()->create();
+
+    $this->actingAs($user);
+
+    Volt::test('pages.admin.menu')
+        ->call('delete', $item->id)
+        ->assertForbidden();
+
+    expect(MenuItem::find($item->id))->not->toBeNull();
+});
+
 test('staff can create a menu item', function () {
     $category = Category::factory()->create();
 

@@ -78,8 +78,15 @@ new #[Layout('layouts.admin')] class extends Component
         $this->dispatch('open-menu-form');
     }
 
+    private function ensureStaff(): void
+    {
+        abort_unless(auth()->user()?->is_staff, 403);
+    }
+
     public function openEdit(int $id): void
     {
+        $this->ensureStaff();
+
         $item = MenuItem::findOrFail($id);
 
         $this->editingId = $item->id;
@@ -105,6 +112,8 @@ new #[Layout('layouts.admin')] class extends Component
 
     public function save(): void
     {
+        $this->ensureStaff();
+
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'categoryId' => ['required', 'integer', 'exists:categories,id'],
@@ -130,12 +139,16 @@ new #[Layout('layouts.admin')] class extends Component
 
     public function toggleAvailable(int $id): void
     {
+        $this->ensureStaff();
+
         $item = MenuItem::findOrFail($id);
         $item->update(['is_available' => ! $item->is_available]);
     }
 
     public function delete(int $id): void
     {
+        $this->ensureStaff();
+
         $item = MenuItem::findOrFail($id);
 
         // Order history references menu items (restrictOnDelete) — don't orphan it.
