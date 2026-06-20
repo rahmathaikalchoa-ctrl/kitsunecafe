@@ -442,7 +442,7 @@ new #[Layout('layouts.admin')] class extends Component
 
                     <div class="flex justify-end gap-2 pt-2">
                         <flux:button type="button" variant="ghost" x-on:click="open = false">Cancel</flux:button>
-                        <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="save">
+                        <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="save" :disabled="$categories->isEmpty()">
                             {{ $editingId ? 'Save changes' : 'Add item' }}
                         </flux:button>
                     </div>
