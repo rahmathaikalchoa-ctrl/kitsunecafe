@@ -112,6 +112,20 @@ test('staff can create a menu item', function () {
     expect(MenuItem::where('name', 'Fox Parfait')->where('price_cents', 25000)->exists())->toBeTrue();
 });
 
+test('a menu item name is trimmed before saving', function () {
+    $category = Category::factory()->create();
+
+    Volt::test('pages.admin.menu')
+        ->call('openCreate')
+        ->set('name', '  Fox Parfait  ')
+        ->set('categoryId', $category->id)
+        ->set('priceCents', 25000)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(MenuItem::where('name', 'Fox Parfait')->exists())->toBeTrue();
+});
+
 test('creating a menu item requires name, category and price', function () {
     Volt::test('pages.admin.menu')
         ->call('openCreate')

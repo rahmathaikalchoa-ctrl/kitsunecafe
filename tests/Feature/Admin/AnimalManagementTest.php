@@ -21,6 +21,17 @@ test('a non-staff user cannot mutate animals', function () {
     expect(Animal::find($animal->id))->not->toBeNull();
 });
 
+test('an animal name is trimmed before saving', function () {
+    Volt::test('pages.admin.animals')
+        ->call('openCreate')
+        ->set('name', '  Aki  ')
+        ->set('description', 'A curious young fox.')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(Animal::where('name', 'Aki')->exists())->toBeTrue();
+});
+
 test('validation errors use friendly attribute names', function () {
     Volt::test('pages.admin.animals')
         ->call('openCreate')

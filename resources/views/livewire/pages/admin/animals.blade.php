@@ -105,6 +105,7 @@ new #[Layout('layouts.admin')] class extends Component
     public function save(): void
     {
         $this->ensureStaff();
+        $this->name = trim($this->name);
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
