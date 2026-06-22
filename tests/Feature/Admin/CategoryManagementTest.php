@@ -29,6 +29,16 @@ test('category names must be unique', function () {
         ->assertHasErrors('name');
 });
 
+test('a category name is trimmed before saving', function () {
+    Volt::test('pages.admin.categories')
+        ->call('openCreate')
+        ->set('name', '  Pastries  ')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect(Category::where('name', 'Pastries')->exists())->toBeTrue();
+});
+
 test('staff can rename a category', function () {
     $category = Category::factory()->create(['name' => 'Snacks']);
 

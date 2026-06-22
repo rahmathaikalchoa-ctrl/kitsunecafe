@@ -39,6 +39,7 @@ new #[Layout('layouts.admin')] class extends Component
     public function save(): void
     {
         $this->ensureStaff();
+        $this->name = trim($this->name);
 
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')->ignore($this->editingId)],
@@ -52,6 +53,7 @@ new #[Layout('layouts.admin')] class extends Component
     public function delete(int $id): void
     {
         $this->ensureStaff();
+        $this->resetValidation('delete');
 
         $category = Category::findOrFail($id);
 
