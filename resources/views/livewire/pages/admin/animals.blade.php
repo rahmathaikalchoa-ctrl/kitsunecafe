@@ -172,30 +172,56 @@ new #[Layout('layouts.admin')] class extends Component
         return [
             'animals' => Animal::orderBy('name')->paginate(15),
             'speciesOptions' => AnimalSpecies::cases(),
+            'totalCount' => Animal::count(),
+            'activeCount' => Animal::active()->count(),
         ];
     }
 }; ?>
 
 <x-slot name="header">
     <div class="flex items-center justify-between gap-3">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Animals</h2>
-        <flux:button wire:click="openCreate" variant="primary" size="sm">Add fox</flux:button>
+        <div>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Animals</h2>
+            <p class="text-xs text-gray-400 mt-0.5">Manage the resident foxes customers meet on the site.</p>
+        </div>
+        <flux:button wire:click="openCreate" variant="primary" size="sm" icon="plus">Add fox</flux:button>
     </div>
 </x-slot>
 
+@php
+    $hiddenCount = $totalCount - $activeCount;
+
+    $foxIcon = 'M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z';
+    $eyeIcon = 'M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z';
+    $eyeOffIcon = 'M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88';
+@endphp
+
 <div class="py-8 px-4 sm:px-6 lg:px-8"
      x-data="{ open: false }"
-     x-on:open-animal-form.window="open = true"
+     x-on:open-animal-form.window="open = true; $nextTick(() => $refs.nameInput?.focus())"
      x-on:close-animal-form.window="open = false"
      x-on:keydown.escape.window="open = false">
 
     <div class="max-w-4xl">
         @if ($animals->isEmpty())
-            <div class="text-center py-16 text-gray-400">
-                <p class="text-lg">No animals yet.</p>
-                <button wire:click="openCreate" class="mt-3 text-sm font-medium text-amber-600 hover:underline">Add the first fox</button>
+            <div class="rounded-2xl bg-white border border-gray-100 shadow-xs text-center py-16 px-4">
+                <span class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
+                    <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $foxIcon }}" />
+                    </svg>
+                </span>
+                <p class="mt-4 text-lg text-gray-500">No animals yet.</p>
+                <p class="mt-1 text-sm text-gray-400">Add your first fox so customers can get to know them.</p>
+                <flux:button wire:click="openCreate" variant="primary" size="sm" icon="plus" class="mt-5">Add the first fox</flux:button>
             </div>
         @else
+            {{-- Overview --}}
+            <div class="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <x-admin.stat-card label="Foxes" :value="$totalCount" sub="Total profiles" tint="bg-amber-50 text-amber-600" :icon="$foxIcon" />
+                <x-admin.stat-card label="Active" :value="$activeCount" sub="Shown to customers" tint="bg-green-50 text-green-600" :icon="$eyeIcon" />
+                <x-admin.stat-card label="Hidden" :value="$hiddenCount" sub="Not yet published" tint="bg-gray-100 text-gray-500" :icon="$eyeOffIcon" />
+            </div>
+
             <div class="bg-white rounded-2xl shadow-xs border border-gray-100 overflow-hidden">
                 <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -210,31 +236,56 @@ new #[Layout('layouts.admin')] class extends Component
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         @foreach ($animals as $animal)
-                            <tr wire:key="animal-{{ $animal->id }}" class="hover:bg-amber-50/40 transition-colors">
+                            <tr wire:key="animal-{{ $animal->id }}" class="group hover:bg-amber-50/40 transition-colors">
                                 <td class="px-5 py-3">
                                     @if ($animal->image_path)
                                         <img src="{{ $animal->imageUrl() }}" alt="{{ $animal->name }}" loading="lazy"
                                              class="h-10 w-10 rounded-lg object-cover border border-gray-100" />
                                     @else
-                                        <div class="h-10 w-10 rounded-lg bg-gray-100 border border-gray-200" aria-hidden="true"></div>
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-400 border border-amber-100" aria-hidden="true">
+                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $foxIcon }}" />
+                                            </svg>
+                                        </div>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 font-medium text-gray-900">{{ $animal->name }}</td>
                                 <td class="px-4 py-3 text-gray-500">{{ $animal->color ?? '—' }}</td>
                                 <td class="px-4 py-3">
                                     @if ($animal->is_active)
-                                        <span class="inline-flex items-center rounded-full bg-green-50 text-green-700 border border-green-100 text-xs font-medium px-2.5 py-0.5">Active</span>
+                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 text-green-700 border border-green-100 text-xs font-medium px-2.5 py-0.5">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Active
+                                        </span>
                                     @else
-                                        <span class="inline-flex items-center rounded-full bg-gray-100 text-gray-500 border border-gray-200 text-xs font-medium px-2.5 py-0.5">Hidden</span>
+                                        <span class="inline-flex items-center gap-1.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200 text-xs font-medium px-2.5 py-0.5">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-gray-400"></span> Hidden
+                                        </span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3">
-                                    <div class="flex items-center justify-end gap-3 text-sm">
-                                        <button wire:click="toggleActive({{ $animal->id }})" class="font-medium text-gray-500 hover:text-amber-600 transition">
-                                            {{ $animal->is_active ? 'Hide' : 'Show' }}
+                                    <div class="flex items-center justify-end gap-1 sm:opacity-60 sm:group-hover:opacity-100 transition-opacity">
+                                        <button wire:click="toggleActive({{ $animal->id }})" wire:loading.attr="disabled" wire:target="toggleActive({{ $animal->id }})"
+                                                type="button" title="{{ $animal->is_active ? 'Hide' : 'Show' }}"
+                                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition disabled:opacity-50 disabled:cursor-wait">
+                                            <span class="sr-only">{{ $animal->is_active ? 'Hide' : 'Show' }} {{ $animal->name }}</span>
+                                            <svg class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $animal->is_active ? $eyeOffIcon : $eyeIcon }}" />
+                                            </svg>
                                         </button>
-                                        <button wire:click="openEdit({{ $animal->id }})" class="font-medium text-amber-600 hover:underline">Edit</button>
-                                        <button wire:click="delete({{ $animal->id }})" wire:confirm="Delete this fox? This can't be undone." class="font-medium text-gray-400 hover:text-red-500 transition">Delete</button>
+                                        <button wire:click="openEdit({{ $animal->id }})" type="button" title="Edit"
+                                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition">
+                                            <span class="sr-only">Edit {{ $animal->name }}</span>
+                                            <svg class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
+                                            </svg>
+                                        </button>
+                                        <button wire:click="delete({{ $animal->id }})" wire:confirm="Delete this fox? This can't be undone." type="button" title="Delete"
+                                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition">
+                                            <span class="sr-only">Delete {{ $animal->name }}</span>
+                                            <svg class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.16-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.04-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                            </svg>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -250,14 +301,26 @@ new #[Layout('layouts.admin')] class extends Component
         {{-- Create/Edit modal --}}
         <div x-show="open" x-cloak x-transition.opacity class="fixed inset-0 bg-black/50 z-40" x-on:click="open = false"></div>
         <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto" x-on:click="open = false">
-            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl my-10 p-6" x-on:click.stop>
-                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ $editingId ? 'Edit fox' : 'Add fox' }}</h3>
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl my-10 p-6"
+                 x-on:click.stop
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                 role="dialog" aria-modal="true">
+                <div class="flex items-center gap-3 mb-5">
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $foxIcon }}" />
+                        </svg>
+                    </span>
+                    <h3 class="text-lg font-bold text-gray-900">{{ $editingId ? 'Edit fox' : 'Add fox' }}</h3>
+                </div>
 
                 <form wire:submit="save" class="space-y-4">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <flux:field>
                             <flux:label>Name</flux:label>
-                            <flux:input wire:model="name" type="text" />
+                            <flux:input wire:model="name" type="text" x-ref="nameInput" autocomplete="off" />
                             <flux:error name="name" />
                         </flux:field>
                         <flux:field>
@@ -337,7 +400,8 @@ new #[Layout('layouts.admin')] class extends Component
                     <div class="flex justify-end gap-2 pt-2">
                         <flux:button type="button" variant="ghost" x-on:click="open = false">Cancel</flux:button>
                         <flux:button type="submit" variant="primary" wire:loading.attr="disabled" wire:target="save">
-                            {{ $editingId ? 'Save changes' : 'Add fox' }}
+                            <span wire:loading.remove wire:target="save">{{ $editingId ? 'Save changes' : 'Add fox' }}</span>
+                            <span wire:loading wire:target="save">Saving…</span>
                         </flux:button>
                     </div>
                 </form>

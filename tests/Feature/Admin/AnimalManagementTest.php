@@ -32,6 +32,16 @@ test('an animal name is trimmed before saving', function () {
     expect(Animal::where('name', 'Aki')->exists())->toBeTrue();
 });
 
+test('the animals overview stat strip renders', function () {
+    Animal::factory()->create(['is_active' => true]);
+    Animal::factory()->inactive()->create();
+
+    Volt::test('pages.admin.animals')
+        ->assertSee('Foxes')
+        ->assertSee('Active')
+        ->assertSee('Hidden');
+});
+
 test('validation errors use friendly attribute names', function () {
     Volt::test('pages.admin.animals')
         ->call('openCreate')
