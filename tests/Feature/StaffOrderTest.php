@@ -27,6 +27,18 @@ test('admin orders list shows each order note and items', function () {
         ->assertSee('Fox Ramen');
 });
 
+test('the orders overview stat strip renders', function () {
+    $staff = User::factory()->staff()->create();
+    Order::factory()->create(['status' => OrderStatus::Pending->value]);
+    Order::factory()->create(['status' => OrderStatus::Completed->value]);
+
+    $this->actingAs($staff);
+
+    Volt::test('pages.admin.orders')
+        ->assertSee('Awaiting action')   // Pending stat sub-label
+        ->assertSee('Served');           // Completed stat sub-label
+});
+
 test('admin order search matches the order reference', function () {
     $staff = User::factory()->staff()->create();
     $mine = Order::factory()->create();

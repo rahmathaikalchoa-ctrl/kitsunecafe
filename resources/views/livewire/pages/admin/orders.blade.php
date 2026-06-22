@@ -69,6 +69,10 @@ new #[Layout('layouts.admin')] class extends Component
 
     public function with(): array
     {
+        // Whole-table counts in one grouped query — independent of the active filter so the
+        // overview always reflects the full picture.
+        $counts = Order::selectRaw('status, count(*) as aggregate')->groupBy('status')->pluck('aggregate', 'status');
+
         return [
             'orders' => Order::query()
                 ->when($this->status, fn ($q) => $q->where('status', $this->status))
@@ -90,16 +94,44 @@ new #[Layout('layouts.admin')] class extends Component
                 ->latest()
                 ->paginate(15),
             'statuses' => OrderStatus::cases(),
+            'statusCounts' => $counts,
+            'totalCount' => (int) $counts->sum(),
         ];
     }
 }; ?>
 
 <x-slot name="header">
-    <h2 class="font-semibold text-xl text-gray-800 leading-tight">Manage Orders</h2>
+    <div>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Manage Orders</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Track and advance customer orders through the kitchen.</p>
+    </div>
 </x-slot>
+
+@php
+    $statusMeta = [
+        'pending' => ['tint' => 'bg-amber-50 text-amber-600', 'sub' => 'Awaiting action', 'icon' => 'M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'],
+        'confirmed' => ['tint' => 'bg-blue-50 text-blue-600', 'sub' => 'In progress', 'icon' => 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'],
+        'completed' => ['tint' => 'bg-green-50 text-green-600', 'sub' => 'Served', 'icon' => 'M4.5 12.75l6 6 9-13.5'],
+        'cancelled' => ['tint' => 'bg-gray-100 text-gray-500', 'sub' => 'Cancelled', 'icon' => 'm9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'],
+    ];
+@endphp
 
 <div class="py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-4xl">
+
+        {{-- Overview --}}
+        @if ($totalCount > 0)
+            <div class="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                @foreach ($statuses as $case)
+                    <x-admin.stat-card
+                        :label="$case->label()"
+                        :value="$statusCounts[$case->value] ?? 0"
+                        :sub="$statusMeta[$case->value]['sub']"
+                        :tint="$statusMeta[$case->value]['tint']"
+                        :icon="$statusMeta[$case->value]['icon']" />
+                @endforeach
+            </div>
+        @endif
 
         {{-- Search --}}
         <div class="mb-4">
@@ -116,22 +148,32 @@ new #[Layout('layouts.admin')] class extends Component
                 wire:click="$set('status', null)"
                 aria-pressed="{{ $status === null ? 'true' : 'false' }}"
                 @class([
-                    'px-4 py-1.5 rounded-full text-sm font-medium transition',
+                    'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition',
                     'bg-amber-500 text-white' => $status === null,
                     'bg-white text-gray-600 border border-gray-200 hover:border-amber-300' => $status !== null,
                 ])>
                 All
+                <span @class([
+                    'inline-flex items-center justify-center min-w-5 px-1.5 rounded-full text-xs font-semibold',
+                    'bg-white/25 text-white' => $status === null,
+                    'bg-gray-100 text-gray-500' => $status !== null,
+                ])>{{ $totalCount }}</span>
             </button>
             @foreach ($statuses as $case)
                 <button
                     wire:click="$set('status', '{{ $case->value }}')"
                     aria-pressed="{{ $status === $case->value ? 'true' : 'false' }}"
                     @class([
-                        'px-4 py-1.5 rounded-full text-sm font-medium transition',
+                        'inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium transition',
                         'bg-amber-500 text-white' => $status === $case->value,
                         'bg-white text-gray-600 border border-gray-200 hover:border-amber-300' => $status !== $case->value,
                     ])>
                     {{ $case->label() }}
+                    <span @class([
+                        'inline-flex items-center justify-center min-w-5 px-1.5 rounded-full text-xs font-semibold',
+                        'bg-white/25 text-white' => $status === $case->value,
+                        'bg-gray-100 text-gray-500' => $status !== $case->value,
+                    ])>{{ $statusCounts[$case->value] ?? 0 }}</span>
                 </button>
             @endforeach
         </div>
@@ -145,7 +187,7 @@ new #[Layout('layouts.admin')] class extends Component
                 @foreach ($orders as $order)
                     <li wire:key="admin-order-{{ $order->id }}"
                         x-data="{ open: false }"
-                        class="rounded-2xl bg-white border border-gray-100 shadow-xs p-5 transition hover:border-amber-200 hover:shadow-md">
+                        class="rounded-2xl bg-white border border-gray-100 border-l-4 {{ $order->status->accentClass() }} shadow-xs p-5 transition hover:border-amber-200 hover:shadow-md">
                         <div class="flex flex-wrap items-start justify-between gap-3">
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2">

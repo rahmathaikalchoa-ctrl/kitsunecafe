@@ -39,6 +39,17 @@ enum OrderStatus: string
         };
     }
 
+    /** Tailwind border colour for the order card's status accent. */
+    public function accentClass(): string
+    {
+        return match ($this) {
+            self::Pending => 'border-l-amber-300',
+            self::Confirmed => 'border-l-blue-300',
+            self::Completed => 'border-l-green-300',
+            self::Cancelled => 'border-l-gray-200',
+        };
+    }
+
     /** A customer may only cancel an order that is still pending. */
     public function isCancellable(): bool
     {
