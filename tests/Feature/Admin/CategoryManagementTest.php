@@ -3,6 +3,7 @@
 use App\Models\Category;
 use App\Models\MenuItem;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Livewire\Volt\Volt;
 
 beforeEach(function () {
@@ -27,6 +28,13 @@ test('category names must be unique', function () {
         ->set('name', 'Drinks')
         ->call('save')
         ->assertHasErrors('name');
+});
+
+test('category names are unique at the database level', function () {
+    Category::factory()->create(['name' => 'Drinks']);
+
+    expect(fn () => Category::factory()->create(['name' => 'Drinks']))
+        ->toThrow(QueryException::class);
 });
 
 test('a category name is trimmed before saving', function () {
