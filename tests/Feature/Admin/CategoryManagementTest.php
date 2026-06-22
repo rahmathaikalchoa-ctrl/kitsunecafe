@@ -49,6 +49,19 @@ test('staff can delete an empty category', function () {
     expect(Category::find($category->id))->toBeNull();
 });
 
+test('a non-staff user cannot mutate categories', function () {
+    $user = User::factory()->create(); // not staff
+    $category = Category::factory()->create();
+
+    $this->actingAs($user);
+
+    Volt::test('pages.admin.categories')
+        ->call('delete', $category->id)
+        ->assertForbidden();
+
+    expect(Category::find($category->id))->not->toBeNull();
+});
+
 test('deleting a category that still has items is blocked', function () {
     $category = Category::factory()->create();
     MenuItem::factory()->create(['category_id' => $category->id]);

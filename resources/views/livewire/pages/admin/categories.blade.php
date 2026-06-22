@@ -20,8 +20,15 @@ new #[Layout('layouts.admin')] class extends Component
         $this->dispatch('open-category-form');
     }
 
+    private function ensureStaff(): void
+    {
+        abort_unless(auth()->user()?->is_staff, 403);
+    }
+
     public function openEdit(int $id): void
     {
+        $this->ensureStaff();
+
         $category = Category::findOrFail($id);
         $this->editingId = $category->id;
         $this->name = $category->name;
@@ -31,6 +38,8 @@ new #[Layout('layouts.admin')] class extends Component
 
     public function save(): void
     {
+        $this->ensureStaff();
+
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')->ignore($this->editingId)],
         ]);
@@ -42,6 +51,8 @@ new #[Layout('layouts.admin')] class extends Component
 
     public function delete(int $id): void
     {
+        $this->ensureStaff();
+
         $category = Category::findOrFail($id);
 
         if ($category->menuItems()->exists()) {
